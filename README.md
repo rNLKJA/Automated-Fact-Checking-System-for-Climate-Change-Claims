@@ -24,4 +24,4 @@ or create environment manually, dependencies are available in `env` folder.
 
 ---
 
-<p align=right>2024@Xuan,Wei&Sunchuangyu</p>
+<p align=right>2024@Xuan Wei Sunchuangyu</p>
