@@ -1,5 +1,7 @@
 ## Data
 
+You are provided with several files for the project:
+
 - `train-claims.json`, `dev-claims.json`: JSON files for the labelled training and development set;
 - `test-claims-unlabelled`.json: JSON file for the unlabelled test set;
 - `evidence.json`: JSON file containing a large number of evidence passages (i.e. the “knowledge source”);
