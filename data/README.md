@@ -12,6 +12,6 @@ The evidence.json file is too big (174.2MB) to upload via github. Please downloa
 You can use the following downloading script:
 
 ```python
-from scripts.data_downloader.py import ClimateFactCheckerDataDownloader
-ClimateFactCheckerDataDownloader().downloader.download_all()
+from data_downloader import ClimateFactCheckerDataDownloader
+ClimateFactCheckerDataDownloader().download_all()
 ```
