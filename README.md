@@ -6,7 +6,7 @@
 
 | Name              | Student ID | Email                               |
 | ----------------- | ---------- | ----------------------------------- |
-| Xuan Wang         | 1329456    | xuan.wang19@student.unimelb.edu.au  |
+| Xuan Wang         | 1329456    | xuan.wang8@student.unimelb.edu.au   |
 | Wei Zhao          | 1118649    | weizhao1@student.unimelb.edu.au     |
 | Sunchuangyu Huang | 1118472    | sunchuangyuh@student.unimelb.edu.au |
 
