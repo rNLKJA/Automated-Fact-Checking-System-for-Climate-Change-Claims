@@ -1,4 +1,4 @@
-# COMP90042-Natural-Language-Processing-Group-Project
+# Automated Fact-Checking System for Climate Change Claims <br> TF-IDF Evidence Retrieval & Transformer Claim Classification
 
 2024 S1 COMP90042 Natural Language Processing Group Project
 
