@@ -2,6 +2,8 @@
 
 2024 S1 COMP90042 Natural Language Processing Group Project
 
+Overleaf Report: https://www.overleaf.com/read/sgchwdbmvjbq#c47aff 
+
 ## Team Members
 
 | Name              | Student ID | Email                               |
