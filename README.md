@@ -1,106 +1,116 @@
-# Automated Fact-Checking System for Climate Change Claims <br> TF-IDF Evidence Retrieval & Transformer Claim Classification
+<div align="center">
 
-2024 S1 COMP90042 Natural Language Processing Group Project
+# Automated Fact-Checking System for Climate-Change Claims
 
-Fork with [2024 COMP90042 Project Description](https://github.com/drcarenhan/COMP90042_2024/tree/main).
+TF-IDF evidence retrieval + Transformer / LSTM claim classification.
 
-Overleaf Report: https://www.overleaf.com/read/sgchwdbmvjbq#c47aff 
+[![Python](https://img.shields.io/badge/Python-3.8-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![PyTorch](https://img.shields.io/badge/PyTorch-deep_learning-EE4C2C?logo=pytorch&logoColor=white)](https://pytorch.org/)
+[![scikit-learn](https://img.shields.io/badge/scikit--learn-TF--IDF-F7931E?logo=scikitlearn&logoColor=white)](https://scikit-learn.org/)
+[![spaCy](https://img.shields.io/badge/spaCy-NLP-09A3D5?logo=spacy&logoColor=white)](https://spacy.io/)
+[![University of Melbourne](https://img.shields.io/badge/University_of_Melbourne-COMP90042-002250)](https://handbook.unimelb.edu.au/subjects/comp90042)
 
-## Team Members
+</div>
 
-| Name              | Student ID | Email                               |
-| ----------------- | ---------- | ----------------------------------- |
-| Xuan Wang         | 1329456    | xuan.wang8@student.unimelb.edu.au   |
-| Wei Zhao          | 1118649    | weizhao1@student.unimelb.edu.au     |
-| Sunchuangyu Huang | 1118472    | sunchuangyuh@student.unimelb.edu.au |
+## Overview
 
-## Project Scope
+A group project for the University of Melbourne's **COMP90042 Natural Language
+Processing** subject (2024 Semester 1). Given a claim about climate science, the system
+must **(1)** retrieve the most relevant evidence passages from a large knowledge source,
+and **(2)** classify the claim against that evidence as one of `SUPPORTS`, `REFUTES`,
+`NOT_ENOUGH_INFO` or `DISPUTED`.
 
-The impact of climate change or humanity is a significant cocern. However, the increase is unverified statements regarding climate science has led to a distortion of public opinion, underscoring the importance of conducting on claims related to climate science. Consider the following claim and related evidence:
+The unchecked spread of unverified statements about climate science distorts public
+understanding, which makes automated fact-checking a worthwhile problem. For example:
 
-**Claim**: The Earth's climate sensitivity is so low that a doubling of atmoshperic CO2 will result in a surface temperature change on the order of 1 cellus degree or less.
+> **Claim:** The Earth's climate sensitivity is so low that a doubling of atmospheric
+> CO₂ will result in a surface temperature change on the order of 1 °C or less.
+>
+> **Evidence:** The 1990 IPCC First Assessment Report estimated equilibrium climate
+> sensitivity to a doubling of CO₂ at between 1.5 °C and 4.5 °C, with a best guess of
+> 2.5 °C.
 
-**Evidence**:
-1. In his first paper on the matter, he estimated that global temperature would rise by around 5 to 6 degrees (9.0 to 10.8 F) is the quantity of CO2 was doubled.
-2. The 1990 IPPC First Assessment Report estimated that equilibrium climate sensitivity to a doubling of CO2 lay between 1.5 and 4.5 C (2.7 and 8.1F) with a "best guess in the light of current knowledge" of 2.5C (4.5C).
+The evidence does not support the claim — so a good system should retrieve those
+passages and label the claim accordingly.
 
-It should not be difficult to see that the claim is not supported by the evidence passages, and assuming the source of the evidence is reliable, such a claim is misleading. The challenge of the project is to develop an automated fact-checking system where given a claim, the goal is to find related evidence passages from a knowkedge source and classify whether the claim is supported by the evidence.
+## Approach
 
-More concretely, you will be provided a list of claims and a corpus containing a large number evidence passages (the "knowledge source"), and your system must be:
-1. search for the most related evidence passages from the knowledge source given the claim, and
-2. classify the status of the claim givene the evidence in the fllowing classes: `{SUPPORTS, REFUTES, NOT_ENOUGH_INFO, DISPUTED}`.
+| Stage                    | Method                                                                                                  |
+| ------------------------ | ------------------------------------------------------------------------------------------------------- |
+| **Evidence retrieval**   | TF-IDF vectorisation over the evidence corpus, ranking passages by similarity to the claim.             |
+| **Claim classification** | A Transformer classifier and an LSTM classifier (trained from scratch) compared on the four-class task. |
+| **Preprocessing**        | spaCy / NLTK tokenisation, contraction expansion and cleaning.                                          |
 
-To build a successful system, it must be able to retrieve the correct set of evidence passages and classify the claim correctly.
+Both classifiers are trained only on the provided data, with no pretrained embeddings
+or checkpoints, per the project rules.
 
-## Datasets
+## Evaluation
 
-You are provided with several files for the project:
-- `[train-claims, dev-claims].json`
-- `[test-clcaims-unlabeled].json`
-- `evidence.json`
-- `dev-claims-baseline.json`
-- `eval.py`
+The system is scored on three metrics:
 
-For the labelled claim files (`train-claims.json`, `dev-claims.json`), each increase ocntians the claim ID, claim text, claim label (one of the four classes: `{SUPPORTS, REFUTES, NOT_ENOUGH_INFO, DISPUTED}`, and a list of evidence IDs. The unlabelled claim file (`test-claims-unlabelled.json`) has a similar structure, except that it only contains the claim ID and claim text. 
+1. **Evidence Retrieval F-score** — precision/recall of retrieved evidence passages
+   against the ground truth, averaged over all claims.
+2. **Claim Classification Accuracy** — standard accuracy of the four-class label
+   prediction.
+3. **Harmonic Mean of F and A** — the headline metric used to rank systems on Codalab.
 
-### Training
+`scripts/eval.py` (the official course evaluation script) computes all three.
 
-The training set (`train-claims.json`) should be used for building the models, e.g. for use in development features, rules and heuristics, and for supervised/unsupervised learning. You are encouraged to inspect this data closely to fully understand the task.
+## Repository structure
 
-### Validation
+| Path                            | Contents                                                               |
+| ------------------------------- | ---------------------------------------------------------------------- |
+| `COMP90042_Wed5PM_Group1.ipynb` | Main notebook — data processing, retrieval, both models, results.      |
+| `notebooks/`                    | Copy of the main notebook.                                             |
+| `COMP90042_Wed5PM_Group1.pdf`   | Final written report.                                                  |
+| `scripts/data_downloader.py`    | Downloads the claim/evidence datasets (evidence via Google Drive).     |
+| `scripts/eval.py`               | Official evaluation script (provided).                                 |
+| `data/`                         | Dataset notes; the large `evidence.json` is downloaded, not committed. |
 
-The development set (`dev-claims.json`) is formatted like the training set. This will help you make major implementation decisions (e.g. choosing optimal hyper-parameter configurations), and should also be used for detailed analysis of your system - both measuring performance and for error analysis - in the report.
+## Tech stack
 
-### Testing
+| Purpose        | Tools                       |
+| -------------- | --------------------------- |
+| Retrieval      | scikit-learn (TF-IDF)       |
+| Classification | PyTorch (Transformer, LSTM) |
+| Preprocessing  | spaCy, NLTK, contractions   |
+| Data handling  | pandas, polars, NumPy       |
+| Environment    | Python 3.8, Jupyter         |
 
-You will use the test set (`test-claims-unlabelled.json`) to participate in the Codalab competition. For this reason, no labels (i.e. the evidence passages and claim labels) are provided for this partition. You are allowed (and encouraged) to train your final system on both training and development set so as to maximise performance on the test set, but you should not at any time manually inspect the test datasets; any sign that you have done so will result in loss of marks. In terms of the format of the system output, it should has the identical  of `dev-claims-predictions.json`. Note, `claim_text` field is optional.
-
-## Project Specification
-
-**Allowed Resources**
-- Deep learning libraries: Pytorch, Keas, and TensorFlow.
-- Standard python libraries (e.g. numpy and matplotlib).
-- NLP preprocessing toolkits (e.g. NLTK and Spacy).
-- Source code provided from the workshop.
-
-You **MUST** follow the rules below:
-- use one of the following architectures: **RNN, LSTM, GRU and Transformer**.
-- train your system from scratch, using the data provided in the project.
-- submit `.ipynb` with log outputs.
-- use the provided template [jupyter notebook](https://colab.research.google.com/drive/1CjlVXdEsioH_iGOHUbmrhimTLRXGJIt0?usp=sharing).
-- train your system using only the provided data, which includes a training and a development.
-
-You **MUST NOT**:
-- **copy any open-source code** from any publications (in other words, you must implement the fact checking-system yourself).
-- **use any pretrained word embeedings** (e.g Word2Vec), **pretrained language weights or checkpoints** (e.g. BERT checkpoints) or any **close-source models** (OpenAI GPT-3).
-- **use any open source project code** from GitHub or other platforms.
-- **submit the prediction results** (to the codalab leaderboard) that is **not produced from your code**.
-- **use any rule-based techniques**
-- **must not use models that cannot be run on colab**
-
-## Project Dependencies
+## Getting started
 
 ```bash
-# run the following shell script
-chmod +x ./env/create_conda_env.sh
-./env/create_conda_env.sh
+# 1. install dependencies
+pip install -r requirements.txt
+
+# 2. download the datasets (claims + evidence)
+cd scripts
+python -c "from data_downloader import ClimateFactCheckerDataDownloader; ClimateFactCheckerDataDownloader().download_all()"
 ```
 
-or create environment manually, dependencies are available in `env` folder.
+> `evidence.json` (~174 MB) is too large for GitHub and is fetched from Google Drive by
+> the downloader — see [`data/README.md`](data/README.md).
 
+Then open `COMP90042_Wed5PM_Group1.ipynb` and run it top to bottom. Evaluate predictions
+with:
 
-## Testing and Evaluation
+```bash
+python scripts/eval.py --predictions dev-claims-predictions.json --groundtruth data/dev-claims.json
+```
 
-There are three evaluation metrics:
+## Team
 
-1. **Evidence Retrieval F-score (F)**
-   - computes how well the evidence passages retrieved by the system match the ground truth evidence passages. For each claim, our evaluation considers all the retrieved evidence passages, computes the precision, recall and F-score by comparing them against the ground truth passages, and aggregates the F-scores by averaging over all claims.
-   - E.g. given a claim if a system retrieves the following set `{evidence-1, evidence-2, evidence-3, evidence-4, evidence-5}`, and the ground truth set is `{evidence-1, evidence-5, evidence-10}`, then `precision = 2/5`, `recall = 2/3`, and `F-score = 1/2`. The aim of this metric is to measure how well the retrieval component of your fact checking system works.
-2. **Claim Classification Accuracy (A)**
-  - computes standard classification accuracy for claim label prediction, ignoring the set of evidence passages retrieved by the system. This metric assesses solely how well the system classifies the claim, and is designed to understand how well the classification component of your fact checking system works.
-4. **Harmonic Mean of F and A**:
-  - computes the harmonic mean of the evidence retrieval F-score and claim classification accuracy. Note that this metric is computed at the end after we have obtained the aggregate (over all claims) F-score and accuracy. This metric is designed to assess both the retrieval and classification components of your system, and as such will be used as **the main metric for ranking systems on Codalab**.
+| Name              | Student ID |
+| ----------------- | ---------- |
+| Xuan Wang         | 1329456    |
+| Wei Zhao          | 1118649    |
+| Sunchuangyu Huang | 1118472    |
+
+📄 Report: [Overleaf](https://www.overleaf.com/read/sgchwdbmvjbq#c47aff) ·
+Built on the [2024 COMP90042 project description](https://github.com/drcarenhan/COMP90042_2024/tree/main).
 
 ---
 
-<p align=right>2024@Xuan Wei Sunchuangyu</p>
+<div align="center">
+2024 © Xuan · Wei · Sunchuangyu
+</div>
