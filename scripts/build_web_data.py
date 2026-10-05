@@ -365,6 +365,10 @@ def main():
     tt = clf["token_table"]
     token_rows = [(i, tok, *g) for i, (tok, g) in enumerate(zip(tt["tokens"], tt["g"]))]
 
+    last_term = str(kw_vec.get_feature_names_out()[-1])
+    artifact_count = int(sum(last_term in t.split() for t in tags_col))
+    print(f"tag artifact {last_term!r} in {artifact_count:,} of {len(tags_col):,} passages", flush=True)
+
     # ---- meta ---------------------------------------------------------------------------
     m = retrieval["metrics"]
     meta = {
@@ -386,6 +390,9 @@ def main():
             "sample": len(sample_ids), "sample_seed": SEED, "corpus_rows": int(len(df)), "corpus_total": len(evidence),
         },
         "passage_lengths_match_report": lengths_match,
+        # numpy's argsort pads short passages' top-10 with zero-weight features; the last
+        # vocabulary entry is alphabetic, so it leaks into many tags (see web/src/lib/numpy.ts)
+        "tag_artifact": {"term": last_term, "passages": artifact_count, "of": int(len(tags_col))},
         "claims": {s: len(c) for s, c in claims.items()},
     }
 
