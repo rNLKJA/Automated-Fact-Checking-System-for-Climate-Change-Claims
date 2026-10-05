@@ -23,7 +23,7 @@ export const RUNS: Record<RunId, { title: string; short: string; description: st
   },
   notebook: {
     title: "Re-run: notebook rule",
-    short: "Notebook rule",
+    short: "Notebook",
     description:
       "The rule exactly as committed in the notebook, which adds the cosine similarity twice (sim + overlap + sim).",
   },

@@ -187,7 +187,7 @@ function Evidence({ d, claimTags }: { d: ClaimDetail; claimTags: Set<string> }) 
       </div>
       <div className="grid gap-8 lg:grid-cols-[1.35fr_1fr]">
         <Tabs defaultValue="saved_2024" className="gap-4">
-          <TabsList className="h-auto w-full flex-wrap justify-start gap-1 sm:w-fit">
+          <TabsList className="w-full justify-start gap-0.5 overflow-x-auto sm:w-fit">
             {d.runs.map(({ summary }) => (
               <TabsTrigger
                 key={summary.run}
