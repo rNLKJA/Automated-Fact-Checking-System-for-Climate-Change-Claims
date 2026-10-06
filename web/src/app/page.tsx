@@ -91,6 +91,7 @@ export default function HomePage() {
                 <span>Dev claim {claimNumber(example.claim.id)}</span>
                 <Link
                   href={`/explore/${example.claim.id}`}
+                  aria-label={`Open dev claim ${claimNumber(example.claim.id)}`}
                   className="underline-offset-4 hover:underline"
                 >
                   Open
@@ -100,7 +101,7 @@ export default function HomePage() {
                 &ldquo;{example.claim.text}&rdquo;
               </blockquote>
               <div className="mt-5 space-y-2.5">
-                {saved.passages.slice(0, 3).map((p) => (
+                {saved.passages.map((p) => (
                   <p
                     key={p.id}
                     className={
@@ -123,7 +124,8 @@ export default function HomePage() {
                 <span className="ml-2 text-muted-foreground">Model:</span>
                 <VerdictBadge label={prediction.label} size="sm" />
                 <span className="ml-auto text-xs text-muted-foreground tabular">
-                  evidence F {fixed(saved.summary.f, 2)}
+                  evidence F {fixed(saved.summary.f, 2)} ({saved.passages.length} retrieved,{" "}
+                  {saved.summary.nCorrect} of {example.gold.length} gold)
                 </span>
               </div>
             </figure>
@@ -204,43 +206,48 @@ export default function HomePage() {
           test set of the course leaderboard. Retrieval found the right passages for only{" "}
           {o.retrieval.dev_claims_with_any_hit_saved_2024} of {o.claims.dev} dev claims.
         </SectionHeading>
-        <div className="mt-10 overflow-x-auto rounded-xl border border-border bg-card">
-          <table className="w-full min-w-[34rem] text-left text-sm">
+        <div
+          className="mt-10 overflow-x-auto rounded-xl border border-border bg-card"
+          role="region"
+          aria-label="Reported results table"
+          tabIndex={0}
+        >
+          <table className="w-full text-left text-xs sm:text-sm [&_td]:px-3 sm:[&_td]:px-5 [&_th]:px-3 sm:[&_th]:px-5">
             <caption className="sr-only">
               Results reported in the team&rsquo;s 2024 report (Table 2)
             </caption>
             <thead className="border-b border-border text-muted-foreground">
               <tr>
-                <th scope="col" className="px-5 py-3 font-medium">
+                <th scope="col" className="py-3 font-medium">
                   Reported in 2024
                 </th>
-                <th scope="col" className="px-5 py-3 text-right font-medium">
+                <th scope="col" className="py-3 text-right font-medium">
                   Evidence F
                 </th>
-                <th scope="col" className="px-5 py-3 text-right font-medium">
+                <th scope="col" className="py-3 text-right font-medium">
                   Accuracy
                 </th>
-                <th scope="col" className="px-5 py-3 text-right font-medium">
+                <th scope="col" className="py-3 text-right font-medium">
                   Harmonic mean
                 </th>
               </tr>
             </thead>
             <tbody className="font-mono tabular">
               <tr className="border-b border-border/70">
-                <th scope="row" className="px-5 py-3 font-sans font-normal">
+                <th scope="row" className="py-3 font-sans font-normal">
                   Validation (154 dev claims)
                 </th>
-                <td className="px-5 py-3 text-right">{o.report.validation.f.toFixed(5)}</td>
-                <td className="px-5 py-3 text-right">{o.report.validation.accuracy.toFixed(5)}</td>
-                <td className="px-5 py-3 text-right">{o.report.validation.hm.toFixed(5)}</td>
+                <td className="py-3 text-right">{o.report.validation.f.toFixed(5)}</td>
+                <td className="py-3 text-right">{o.report.validation.accuracy.toFixed(5)}</td>
+                <td className="py-3 text-right">{o.report.validation.hm.toFixed(5)}</td>
               </tr>
               <tr>
-                <th scope="row" className="px-5 py-3 font-sans font-normal">
+                <th scope="row" className="py-3 font-sans font-normal">
                   Test (course leaderboard)
                 </th>
-                <td className="px-5 py-3 text-right">{o.report.test.f.toFixed(5)}</td>
-                <td className="px-5 py-3 text-right">{o.report.test.accuracy.toFixed(5)}</td>
-                <td className="px-5 py-3 text-right">{o.report.test.hm.toFixed(5)}</td>
+                <td className="py-3 text-right">{o.report.test.f.toFixed(5)}</td>
+                <td className="py-3 text-right">{o.report.test.accuracy.toFixed(5)}</td>
+                <td className="py-3 text-right">{o.report.test.hm.toFixed(5)}</td>
               </tr>
             </tbody>
           </table>

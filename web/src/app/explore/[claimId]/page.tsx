@@ -209,9 +209,11 @@ function Evidence({ d, claimTags }: { d: ClaimDetail; claimTags: Set<string> }) 
                   <Metric
                     k="Path"
                     v={
-                      summary.path === "filtered"
-                        ? `filtered (${summary.nFiltered} passed)`
-                        : "fallback (none passed)"
+                      summary.path === null
+                        ? "not recorded"
+                        : summary.path === "filtered"
+                          ? `filtered (${summary.nFiltered} passed)`
+                          : "fallback (none passed)"
                     }
                   />
                   <Metric k="Found" v={`${summary.nCorrect ?? 0} of ${d.gold.length} gold`} />

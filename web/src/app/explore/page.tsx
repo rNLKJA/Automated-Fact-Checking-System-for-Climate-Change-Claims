@@ -51,7 +51,7 @@ export default function ExplorePage() {
           <Stat
             label="Claims on the fallback path"
             value={pct(fallback / claims.length, 0)}
-            note="No passage passed the 0.55 / 0.5 thresholds, so the top six by score were used instead."
+            note="No passage passed the 0.55 / 0.5 thresholds in the re-run of the submission rule, so the top six by score were used instead."
           />
         </div>
         <ClaimBrowser claims={claims} />

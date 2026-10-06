@@ -41,6 +41,23 @@ export default function ResultsPage() {
   };
   const lengths = passageLengths();
   const artifact = getMeta<{ term: string; passages: number; of: number }>("tag_artifact");
+  const histories = trainingHistories();
+  // like for like: the report quotes the final (10th) epoch; the site's model is the best epoch
+  const valAcc = (run: "2024" | "2026") => {
+    const h = histories[run].transformer;
+    const best = h.reduce((a, b) => (b.valAcc > a.valAcc ? b : a));
+    return { final: h[h.length - 1], best };
+  };
+  const t24 = valAcc("2024");
+  const t26 = valAcc("2026");
+  const tiesSame =
+    o.parity.dev.submission_equal_up_to_ties + o.parity.test.submission_equal_up_to_ties;
+  const setsSame = o.parity.dev.submission_same_set + o.parity.test.submission_same_set;
+  const totalLists = o.parity.dev.total + o.parity.test.total;
+  const unexplained = [
+    ...o.parity.dev.submission_unexplained,
+    ...o.parity.test.submission_unexplained,
+  ];
 
   const parity: ParityRow[] = [
     {
@@ -74,8 +91,8 @@ export default function ResultsPage() {
     {
       what: "Saved 2024 retrieval lists re-derived",
       source: "Team's saved output files",
-      original: `${o.parity.dev.total + o.parity.test.total} claims`,
-      rerun: `${o.parity.dev.submission_equal_up_to_ties + o.parity.test.submission_equal_up_to_ties} identical up to tied scores`,
+      original: `${totalLists} dev + test claims`,
+      rerun: `${tiesSame} with identical scores (${setsSame} identical passage sets); ${unexplained.length} not explained`,
       status: "close",
     },
     {
@@ -95,8 +112,8 @@ export default function ResultsPage() {
     {
       what: "Transformer validation accuracy (gold evidence)",
       source: "Report §3.3.1, cell 43",
-      original: pct(o.report.transformer_val_acc, 2) + " (epoch 10)",
-      rerun: pct(matrices.gold_evidence.accuracy, 2) + " (retrained, best epoch)",
+      original: `${pct(t24.final.valAcc, 2)} final epoch · ${pct(t24.best.valAcc, 2)} best (epoch ${t24.best.epoch})`,
+      rerun: `${pct(t26.final.valAcc, 2)} final epoch · ${pct(t26.best.valAcc, 2)} best (epoch ${t26.best.epoch})`,
       status: "close",
     },
     {
@@ -153,7 +170,7 @@ export default function ResultsPage() {
 
         <section className="space-y-6">
           <SectionHeading eyebrow="Classification" title="Transformer vs LSTM, then and now" />
-          <TrainingCurves histories={trainingHistories()} />
+          <TrainingCurves histories={histories} />
           <ChartFrame
             title="Confusion matrix on the dev set"
             takeaway="The model only ever predicts SUPPORTS or NOT_ENOUGH_INFO. Refuted and disputed claims are always missed, whichever evidence it is given."
@@ -168,7 +185,30 @@ export default function ResultsPage() {
             Each row is enforced by an automated test in the repository (vitest for the TypeScript
             ports, assertions in the uv build scripts for the Python re-runs).
           </SectionHeading>
-          <div className="overflow-x-auto rounded-xl border border-border bg-card">
+          {/* below sm: one card per check, so the 2026 value and status stay visible */}
+          <ul className="space-y-3 sm:hidden" aria-label="Reproduction checklist">
+            {parity.map((row) => (
+              <li key={row.what} className="rounded-xl border border-border bg-card p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <p className="text-sm font-medium">{row.what}</p>
+                  <StatusPill status={row.status} />
+                </div>
+                <p className="mt-1 text-xs text-muted-foreground">{row.source}</p>
+                <dl className="mt-3 grid grid-cols-[4.5rem_1fr] gap-x-3 gap-y-1.5 text-xs">
+                  <dt className="text-muted-foreground">2024</dt>
+                  <dd className="font-mono tabular">{row.original}</dd>
+                  <dt className="text-muted-foreground">2026 re-run</dt>
+                  <dd className="font-mono tabular">{row.rerun}</dd>
+                </dl>
+              </li>
+            ))}
+          </ul>
+          <div
+            className="hidden overflow-x-auto rounded-xl border border-border bg-card sm:block"
+            role="region"
+            aria-label="Reproduction checklist table"
+            tabIndex={0}
+          >
             <table className="w-full min-w-[46rem] text-left text-sm">
               <caption className="sr-only">Original numbers versus the 2026 re-run</caption>
               <thead className="border-b border-border text-xs text-muted-foreground">
@@ -222,14 +262,27 @@ export default function ResultsPage() {
             </p>
             <p>
               <span className="font-medium text-foreground">
-                Why some lists differ only by order.
+                Why the re-run does not match every saved list.
               </span>{" "}
-              pandas&rsquo; default quicksort is not stable, so passages with exactly equal scores
-              can come out in either order. The re-run returns the same passages with the same
-              scores for{" "}
-              {o.parity.dev.submission_equal_up_to_ties + o.parity.test.submission_equal_up_to_ties}{" "}
-              of {o.parity.dev.total + o.parity.test.total} claims, and the dev F-score is
-              identical.
+              pandas&rsquo; default quicksort is not stable, so when several passages have exactly
+              the same score, which of them makes the cut depends on the sort&rsquo;s internals
+              (library version, row layout) rather than on the data. The re-run returns passages
+              with the same scores as the saved lists for {tiesSame} of {totalLists} claims.{" "}
+              {setsSame} of those are the very same passages; the other {tiesSame - setsSame} differ
+              only in which tied passage was kept. The dev F-score is identical. The remaining{" "}
+              {unexplained.length} saved lists ({unexplained.join(", ")}) are not explained by the
+              rule: they look like top-six fallback lists even though passages pass the filter,
+              which suggests some extra 2024 logic that the notebook does not contain. Their
+              selection path is therefore shown as &ldquo;not recorded&rdquo;.
+            </p>
+            <p>
+              <span className="font-medium text-foreground">Why the training curves differ.</span>{" "}
+              The 2024 log peaked at {pct(t24.best.valAcc, 2)} in epoch {t24.best.epoch} and ended
+              at {pct(t24.final.valAcc, 2)}, the figure the report quotes. The retrain peaked at{" "}
+              {pct(t26.best.valAcc, 2)} in epoch {t26.best.epoch} and ended at{" "}
+              {pct(t26.final.valAcc, 2)}, so it trails the 2024 run by about{" "}
+              {Math.round((t24.final.valAcc - t26.final.valAcc) * 1000) / 10} percentage points
+              either way. The site uses the best epoch, as the notebook&rsquo;s model selection did.
             </p>
           </div>
         </section>

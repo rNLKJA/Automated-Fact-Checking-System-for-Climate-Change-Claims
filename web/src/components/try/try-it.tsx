@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, LoaderCircle, TriangleAlert } from "lucide-react";
+import { ArrowRight, Info, LoaderCircle, ShieldCheck, TriangleAlert } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 
@@ -17,17 +17,15 @@ import type { CheckResponse } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { ContributionChart } from "./contribution-chart";
 
-const EXAMPLES = [
-  { text: "Arctic sea ice has been shrinking for decades.", note: "finds a gold passage" },
-  { text: "Antarctica is gaining ice, not losing it.", note: "finds a gold passage" },
-  { text: "Carbon dioxide is a trace gas, so it cannot warm the planet.", note: "on topic" },
-  {
-    text: "[South Australia] has the most expensive electricity in the world.",
-    note: "a dev claim",
-  },
-  { text: "Wind turbines kill millions of birds every year.", note: "fallback path" },
-  { text: "The Great Barrier Reef is in better shape than ever.", note: "a telling miss" },
-];
+/** One-click examples; each note was checked against the full-corpus run at build time. */
+export type Example = { text: string; note: string };
+
+/** Agreement of the pruned index with the full corpus on held-out free-text claims. */
+export type SubsetAgreement = {
+  claims: number;
+  agree: number;
+  byPath: Record<"filtered" | "fallback", [agree: number, total: number]>;
+};
 
 type State =
   | { status: "idle" }
@@ -36,11 +34,15 @@ type State =
 
 export function TryIt({
   initialClaim,
+  examples,
+  agreement,
   devAccuracy,
   baseline,
   indexSize,
 }: {
   initialClaim?: string;
+  examples: readonly Example[];
+  agreement: Record<RuleId, SubsetAgreement>;
   devAccuracy: number;
   baseline: number;
   indexSize: number;
@@ -185,7 +187,7 @@ export function TryIt({
         <div className="space-y-2">
           <p className="text-sm font-medium">Or start from an example</p>
           <ul className="space-y-1.5">
-            {EXAMPLES.map((ex) => (
+            {examples.map((ex) => (
               <li key={ex.text}>
                 <button
                   type="button"
@@ -226,7 +228,12 @@ export function TryIt({
             </div>
           </div>
         ) : state.status === "done" ? (
-          <Result r={state.result} devAccuracy={devAccuracy} baseline={baseline} />
+          <Result
+            r={state.result}
+            agreement={agreement[state.result.rule]}
+            devAccuracy={devAccuracy}
+            baseline={baseline}
+          />
         ) : (
           <EmptyState indexSize={indexSize} />
         )}
@@ -247,9 +254,10 @@ function EmptyState({ indexSize }: { indexSize: number }) {
         </li>
         <li>
           <span className="font-medium text-foreground">2. Retrieve.</span> Its stems are compared
-          with the tags of {int(indexSize)} Wikipedia passages: every gold passage in the dataset,
-          every passage the 2024 system retrieved for a dev or test claim, and a random sample of
-          the full 1.2M.
+          with the tags of {int(indexSize)} Wikipedia passages: every gold passage for the train and
+          dev claims, every passage the 2024 rule could select for any of the 1,535 dataset claims
+          or the examples, and a random sample of the full 1.2M. For any other sentence the full
+          2024 search may pick passages that are not in this subset.
         </li>
         <li>
           <span className="font-medium text-foreground">3. Classify.</span> The retrained
@@ -274,10 +282,12 @@ function ResultSkeleton() {
 
 function Result({
   r,
+  agreement,
   devAccuracy,
   baseline,
 }: {
   r: CheckResponse;
+  agreement: SubsetAgreement;
   devAccuracy: number;
   baseline: number;
 }) {
@@ -320,6 +330,7 @@ function Result({
             · {r.retrieval.tookMs.toFixed(0)} ms
           </p>
         </div>
+        <SubsetNote r={r} agreement={agreement} />
         {r.retrieval.path === "fallback" && (
           <p className="rounded-lg bg-muted px-3 py-2 text-sm text-muted-foreground">
             Fallback path: nothing had cosine &gt; 0.55 and tag overlap &gt; 0.5, so the passages
@@ -372,7 +383,7 @@ function Result({
                 return (
                   <span
                     key={`${t}-${i}`}
-                    className={dropped ? "text-muted-foreground/70 line-through" : undefined}
+                    className={dropped ? "text-muted-foreground line-through" : undefined}
                   >
                     {t}
                   </span>
@@ -418,6 +429,46 @@ function Result({
         <ContributionChart r={r} />
       </section>
     </div>
+  );
+}
+
+/** Says on every result whether the pruned index is known to match the full 2024 search. */
+function SubsetNote({ r, agreement }: { r: CheckResponse; agreement: SubsetAgreement }) {
+  const size = int(r.retrieval.indexSize);
+  if (r.retrieval.verified) {
+    return (
+      <p className="flex gap-2.5 rounded-lg border border-hit/40 bg-hit/8 px-3 py-2 text-sm">
+        <ShieldCheck aria-hidden className="mt-0.5 size-4 shrink-0 text-hit" />
+        <span>
+          <span className="font-medium">Same passages as the full 2024 search.</span>{" "}
+          <span className="text-muted-foreground">
+            This claim&rsquo;s tags match a dataset claim or an example that the build re-ran over
+            all 1.19M passages. The {size}-passage subset returns the same selection (exact ties
+            aside).
+          </span>
+        </span>
+      </p>
+    );
+  }
+  const [fbAgree, fbTotal] = agreement.byPath.fallback;
+  const fallback = r.retrieval.path === "fallback";
+  return (
+    <p
+      className={cn(
+        "flex gap-2.5 rounded-lg border px-3 py-2 text-sm",
+        fallback ? "border-nei/50 bg-nei/10" : "border-border bg-card",
+      )}
+    >
+      <Info aria-hidden className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
+      <span className="text-muted-foreground">
+        <span className="font-medium text-foreground">Searched a {size}-passage subset.</span> The
+        full 2024 system searched all 1.19M passages and may select different ones, and so reach a
+        different verdict. On {agreement.claims} hand-written test claims the subset picked the same
+        passages {agreement.agree} times.
+        {fallback &&
+          ` On the fallback path it matched only ${fbAgree} of ${fbTotal}: the six best-scoring passages of 1.19M are rarely in the subset.`}
+      </span>
+    </p>
   );
 }
 

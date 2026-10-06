@@ -11,7 +11,7 @@ import { preprocessAndTokenize, preprocessTrace } from "@/lib/text/preprocess";
 import { getClaimDetail, getEvidence } from "@/server/claims";
 import { getDb, getMeta } from "@/server/db";
 import { getClassifier, getKeywordModel } from "@/server/models";
-import { getOverview } from "@/server/stats";
+import { freeTextParity, getOverview } from "@/server/stats";
 
 export const metadata: Metadata = {
   title: "Method",
@@ -29,6 +29,9 @@ export default function MethodPage() {
   const trace = preprocessTrace(claim);
   const tags = claimTagsOf(claim, preprocessAndTokenize);
   const run = d.runs.find((r) => r.summary.run === "saved_2024")!;
+  // the saved file has no selection details; the re-run returns the very same passages here
+  const rerun = d.runs.find((r) => r.summary.run === "submission")!;
+  const parity = freeTextParity();
   const goldPassage = d.gold[0];
   const keyword = getKeywordModel();
   const keywords = topKeywords(keyword, goldPassage.text, preprocessAndTokenize);
@@ -60,8 +63,8 @@ export default function MethodPage() {
         >
           dev claim 752
         </Link>{" "}
-        from raw text to verdict. Every value on this page is computed live by the TypeScript ports,
-        the same code the Try-it page runs.
+        from raw text to verdict. Every value on this page is computed by the TypeScript ports when
+        the site is built, the same code the Try-it page runs.
       </PageHeader>
 
       <div className="mx-auto max-w-4xl space-y-14 px-4 py-12 sm:px-6">
@@ -132,7 +135,12 @@ export default function MethodPage() {
             <Formula name="overlap" body="shared tags ÷ the smaller tag set" />
             <Formula name="score" body="cosine + overlap (the notebook adds the cosine twice)" />
           </ul>
-          <div className="overflow-x-auto rounded-xl border border-border bg-card">
+          <div
+            className="overflow-x-auto rounded-xl border border-border bg-card"
+            role="region"
+            aria-label="Scores of the selected passages"
+            tabIndex={0}
+          >
             <table className="w-full min-w-[34rem] text-sm">
               <caption className="sr-only">Scores of the passages selected for claim 752</caption>
               <thead className="border-b border-border text-xs text-muted-foreground">
@@ -182,11 +190,11 @@ export default function MethodPage() {
           <p>
             Keep passages with cosine &gt; {RULES.submission.sim} and overlap &gt;{" "}
             {RULES.submission.overlap}. Sort them by score and keep only those sharing the most tags
-            with the claim, at most {RULES.submission.topN}. For this claim {run.summary.nFiltered}{" "}
-            passages passed and the {run.passages.length} sharing {run.passages[0]?.maxMatch} tags
-            were kept. They include {run.summary.nCorrect} of the {d.gold.length} gold passages (F ={" "}
-            {fixed(run.summary.f, 2)}). When nothing passes the filter, the top six by score are
-            returned instead. That happened for{" "}
+            with the claim, at most {RULES.submission.topN}. For this claim{" "}
+            {rerun.summary.nFiltered} passages passed and the {run.passages.length} sharing{" "}
+            {run.passages[0]?.maxMatch} tags were kept. They include {run.summary.nCorrect} of the{" "}
+            {d.gold.length} gold passages (F = {fixed(run.summary.f, 2)}). When nothing passes the
+            filter, the top six by score are returned instead. That happened for{" "}
             {Math.round(o.retrieval.dev_fallback_share_submission * 100)}% of dev claims.
           </p>
         </Step>
@@ -266,9 +274,22 @@ export default function MethodPage() {
               <span className="text-foreground">Evidence</span> is a pruned index of{" "}
               {int(o.index.passages)} Wikipedia sentences out of the course&rsquo;s{" "}
               {int(o.index.corpus_total)}: every gold passage for the train and dev claims (
-              {int(o.index.gold)}), every passage the rule could select for a dev or test claim (
-              {int(o.index.pool)}), and a seeded random sample ({int(o.index.sample)}). The full
-              corpus is not redistributed.
+              {int(o.index.gold)}), every passage either rule could select for any train, dev or
+              test claim ({int(o.index.pool)}), every passage it could select for the Try-it
+              examples ({int(o.index.examples)}), and a seeded random sample ({int(o.index.sample)}
+              ). The sets overlap. The full corpus is not redistributed.
+            </li>
+            <li>
+              <span className="text-foreground">What the pruning costs.</span> For every dataset
+              claim and example the pruned index returns the same passages as the full corpus
+              (tested). For new text it may not: on {parity.claims} hand-written climate claims that
+              played no part in building the index, it picked the same passages as the full 1.19M
+              search for {parity.submission.agree} under the submission rule (
+              {parity.submission.by_path.filtered[0]} of {parity.submission.by_path.filtered[1]} on
+              the filtered path, {parity.submission.by_path.fallback[0]} of{" "}
+              {parity.submission.by_path.fallback[1]} on the fallback path) and{" "}
+              {parity.notebook.agree} under the notebook rule. The claims are listed in{" "}
+              <code>scripts/free_text_claims.py</code>.
             </li>
             <li>
               <span className="text-foreground">Model artefacts</span> (vectorizer vocabularies, the
