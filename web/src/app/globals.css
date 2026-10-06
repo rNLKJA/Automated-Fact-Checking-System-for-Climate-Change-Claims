@@ -1,0 +1,235 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Design tokens - "climate-science editorial".
+ * Light: warm paper and deep-ocean ink. Dark: deep ocean with sea-foam ink.
+ * The warming-stripes ramp is decoration only and is used sparingly.
+ * Verdict and chart colours were checked with the dataviz palette validator
+ * (lightness band, chroma floor, CVD and normal-vision separation, contrast)
+ * against both card surfaces; verdicts always ship with an icon + text label.
+ */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-plex-sans);
+  --font-serif: var(--font-newsreader);
+  --font-mono: var(--font-plex-mono);
+  --font-heading: var(--font-newsreader);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-chart-1: var(--series-1);
+  --color-chart-2: var(--series-2);
+  --color-chart-3: var(--series-3);
+
+  --color-supports: var(--verdict-supports);
+  --color-refutes: var(--verdict-refutes);
+  --color-nei: var(--verdict-nei);
+  --color-disputed: var(--verdict-disputed);
+  --color-series-1: var(--series-1);
+  --color-series-2: var(--series-2);
+  --color-series-3: var(--series-3);
+  --color-hit: var(--hit);
+  --color-stripe-cold: var(--stripe-03);
+  --color-stripe-warm: var(--stripe-14);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+
+  --text-display: clamp(2.5rem, 1.6rem + 3.6vw, 4.5rem);
+  --text-display--line-height: 1.02;
+  --text-headline: clamp(1.75rem, 1.35rem + 1.6vw, 2.5rem);
+  --text-headline--line-height: 1.12;
+}
+
+:root {
+  --radius: 0.625rem;
+
+  --background: #f6f4ee;
+  --foreground: #13212c;
+  --card: #fbfaf6;
+  --card-foreground: #13212c;
+  --popover: #fdfcf9;
+  --popover-foreground: #13212c;
+  --primary: #12324a;
+  --primary-foreground: #f6f4ee;
+  --secondary: #ebe7dc;
+  --secondary-foreground: #13212c;
+  --muted: #eeeae1;
+  --muted-foreground: #56626c;
+  --accent: #e4ecf2;
+  --accent-foreground: #12324a;
+  --destructive: #c0392f;
+  --border: #e0dacd;
+  --input: #d5cfc1;
+  --ring: #2a78d6;
+
+  --verdict-supports: #2a78d6;
+  --verdict-refutes: #e34948;
+  --verdict-nei: #c98500;
+  --verdict-disputed: #108a63;
+  --series-1: #2a78d6;
+  --series-2: #eb6834;
+  --series-3: #1baf7a;
+  --div-pos: #2a78d6;
+  --div-neg: #e34948;
+  --div-mid: #f0efec;
+  --hit: #108a63;
+  --grid: #e7e2d7;
+
+  --seq-100: #cde2fb;
+  --seq-200: #9ec5f4;
+  --seq-300: #6da7ec;
+  --seq-400: #3987e5;
+  --seq-500: #256abf;
+  --seq-600: #184f95;
+  --seq-700: #0d366b;
+  --seq-ink-100: #13212c;
+  --seq-ink-200: #13212c;
+  --seq-ink-300: #13212c;
+  /* dark ink on the mid blue: white only reaches 3.6:1 there */
+  --seq-ink-400: #07131c;
+  --seq-ink-500: #ffffff;
+  --seq-ink-600: #ffffff;
+  --seq-ink-700: #ffffff;
+
+  /* warming-stripes ramp (ColorBrewer RdBu, as used by #ShowYourStripes) */
+  --stripe-01: #08306b;
+  --stripe-02: #08519c;
+  --stripe-03: #2171b5;
+  --stripe-04: #4292c6;
+  --stripe-05: #6baed6;
+  --stripe-06: #9ecae1;
+  --stripe-07: #c6dbef;
+  --stripe-08: #deebf7;
+  --stripe-09: #fee0d2;
+  --stripe-10: #fcbba1;
+  --stripe-11: #fc9272;
+  --stripe-12: #fb6a4a;
+  --stripe-13: #ef3b2c;
+  --stripe-14: #cb181d;
+  --stripe-15: #a50f15;
+  --stripe-16: #67000d;
+}
+
+.dark {
+  --background: #07131c;
+  --foreground: #e4ecf1;
+  --card: #0c1c28;
+  --card-foreground: #e4ecf1;
+  --popover: #0e2030;
+  --popover-foreground: #e4ecf1;
+  --primary: #cfe2f3;
+  --primary-foreground: #07131c;
+  --secondary: #132a3a;
+  --secondary-foreground: #e4ecf1;
+  --muted: #10222f;
+  --muted-foreground: #93a4b2;
+  --accent: #15304a;
+  --accent-foreground: #e4ecf1;
+  --destructive: #ef6a5f;
+  --border: #1c3344;
+  --input: #27445c;
+  --ring: #3987e5;
+
+  --verdict-supports: #3987e5;
+  --verdict-refutes: #e34948;
+  --verdict-nei: #c98500;
+  --verdict-disputed: #1aa877;
+  --series-1: #3987e5;
+  --series-2: #d95926;
+  --series-3: #199e70;
+  --div-pos: #3987e5;
+  --div-neg: #e66767;
+  --div-mid: #383835;
+  --hit: #1aa877;
+  --grid: #183041;
+
+  --seq-100: #10273a;
+  --seq-200: #133556;
+  --seq-300: #184f95;
+  --seq-400: #1c5cab;
+  /* a touch darker than --verdict-supports so white numbers reach 4.8:1 */
+  --seq-500: #2672cc;
+  --seq-600: #5598e7;
+  --seq-700: #9ec5f4;
+  --seq-ink-100: #e4ecf1;
+  --seq-ink-200: #e4ecf1;
+  --seq-ink-300: #ffffff;
+  --seq-ink-400: #ffffff;
+  --seq-ink-500: #ffffff;
+  --seq-ink-600: #07131c;
+  --seq-ink-700: #07131c;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    @apply scroll-smooth font-sans;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "kern", "liga", "calt";
+  }
+  h1,
+  h2,
+  h3 {
+    @apply font-serif tracking-tight text-balance;
+  }
+  ::selection {
+    background: color-mix(in oklab, var(--series-1) 25%, transparent);
+  }
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@utility tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+@utility paper-grain {
+  background-image: radial-gradient(
+    circle at 1px 1px,
+    color-mix(in oklab, var(--foreground) 6%, transparent) 1px,
+    transparent 0
+  );
+  background-size: 22px 22px;
+}

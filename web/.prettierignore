@@ -1,0 +1,7 @@
+.next
+node_modules
+data
+pnpm-lock.yaml
+next-env.d.ts
+src/lib/__fixtures__
+src/lib/text/data
