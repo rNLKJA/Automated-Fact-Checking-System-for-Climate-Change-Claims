@@ -42,19 +42,26 @@ re-tuned.
 
 ## Results: reported vs reproduced
 
-| Metric (dev set unless noted)             |              2024 report | 2026 re-run                                                     |
-| ----------------------------------------- | -----------------------: | --------------------------------------------------------------- |
-| Evidence retrieval F-score                |                  0.04299 | **0.04299** (exact, full 1.19M-passage corpus)                  |
-| Claim accuracy                            |                  0.55844 | 0.383 (classifier retrained: the 2024 weights were never saved) |
-| Harmonic mean                             |                  0.07984 | 0.077                                                           |
-| Test set (course leaderboard), F / A / HM | 0.0331 / 0.4079 / 0.0612 | test labels were never released                                 |
-| Notebook's own final-cell F-score         |                 0.011205 | **0.011205** (exact)                                            |
-| Report Table 1 passage-length counts      |                7 buckets | **identical**                                                   |
+| Metric (dev set unless noted)             |              2024 report | 2026 re-run                                                       |
+| ----------------------------------------- | -----------------------: | ----------------------------------------------------------------- |
+| Evidence retrieval F-score                |                  0.04299 | **0.04299** (exact, full 1.19M-passage corpus)                    |
+| Claim accuracy                            |                  0.55844 | 0.383 (classifier retrained: the 2024 weights were never saved)   |
+| Harmonic mean                             |                  0.07984 | 0.077                                                             |
+| Test set (course leaderboard), F / A / HM | 0.0331 / 0.4079 / 0.0612 | test labels were never released                                   |
+| Notebook's own final-cell F-score         |                 0.011205 | **0.011205** (exact)                                              |
+| Saved 2024 retrieval lists (dev + test)   |               307 claims | 303 with identical scores (244 identical passages), 4 unexplained |
+| Report Table 1 passage-length counts      |                7 buckets | **identical**                                                     |
 
 Retrieval was the weak link in 2024 and still is: the gold passage was found for only 13 of
 154 dev claims. The retrained Transformer tracks the 2024 training log closely (epoch-1 train
-loss 1.1448 vs 1.1442). On retrieved evidence, though, it scores below the 44.2% you would get by
-always answering "supports". The notebook's own last evaluation cell printed 35.1%.
+loss 1.1448 vs 1.1442), although its best validation accuracy is 57.8% against 60.4% in 2024. On
+retrieved evidence it scores below the 44.2% you would get by always answering "supports". The
+notebook's own last evaluation cell printed 35.1%.
+
+Where the re-run differs from a saved 2024 retrieval list, it is because pandas' unstable sort
+kept a different one of several exactly tied passages. The exceptions are 4 lists (claim-540,
+claim-1160, claim-1582, claim-2329) that look like top-6 fallback lists although passages pass
+the filter, which points to 2024 logic that is not in the notebook.
 
 ### Four things the re-run revealed
 
@@ -98,12 +105,13 @@ always answering "supports". The notebook's own last evaluation cell printed 35.
 │   └── requirements.txt  pyproject.toml
 ├── scripts/                     # uv scripts that re-run the original code (see scripts/README.md)
 │   ├── original.py              # notebook functions, verbatim
+│   ├── free_text_claims.py      # Try-it examples + held-out claims that measure the pruned index
 │   ├── fetch_data.py            # step 0: verify/link inputs into .cache/ (MD5-pinned)
 │   ├── build_retrieval.py       # step 1: retrieval over all 1.19M passages, parity, sweeps
 │   ├── train_classifier.py      # step 2: retrain Transformer + LSTM, export token table
 │   └── build_web_data.py        # step 3: web/data/climate.db, TS data modules, fixtures
 └── web/                         # the deployable Next.js app (Vercel root)
-    ├── data/climate.db          # read-only SQLite artefact (11 MB)
+    ├── data/climate.db          # read-only SQLite artefact (13 MB)
     └── src/
         ├── app/                 # /, /try, /explore, /explore/[claimId], /results, /method, /api/check
         ├── components/          # ui/ (shadcn), layout/, common/, evidence/, explore/, try/, charts/
@@ -114,7 +122,7 @@ always answering "supports". The notebook's own last evaluation cell printed 35.
 
 ## Local development
 
-Requirements: Node 20.9+ and pnpm 10.
+Requirements: Node 22+ and pnpm 10.
 
 ```bash
 cd web
@@ -136,18 +144,25 @@ installed, from the repository root:
 
 ```bash
 uv run scripts/fetch_data.py --from "/path/to/local/copy"   # or --download (2024 URLs)
-uv run scripts/build_retrieval.py      # ~3 min
+uv run scripts/build_retrieval.py      # ~6 min
 uv run scripts/train_classifier.py     # ~7 min on CPU
 uv run scripts/build_web_data.py       # ~1 min, deterministic (byte-identical output)
 ```
 
 The database contains:
 
-- **Claims:** 1,228 train, 154 dev and 153 test claims, with their stemmed tags and gold evidence ids.
-- **A pruned evidence index:** 32,568 passages, not the full corpus. It holds every gold
-  passage for train and dev, every passage the rule could select for a dev or test claim (so
-  the TS port reproduces the full-corpus selections), and a seeded random sample of 25,000. Each
-  passage keeps the team's tags and its exact row of their TF-IDF matrix.
+- **Claims:** 1,228 train, 154 dev and 153 test claims as ids, labels, stemmed tags and gold
+  evidence ids. Only the 154 dev claims keep their text (the Explore pages show them); train and
+  test claim texts are not redistributed.
+- **A pruned evidence index:** 39,666 passages, not the full corpus. It holds every gold
+  passage for train and dev, every passage either rule could select for any train, dev or test
+  claim, every passage it could select for the Try-it examples, and a seeded random sample of
+  25,000. Each passage keeps the team's tags and its exact row of their TF-IDF matrix. For every
+  dataset claim and example the TS port therefore returns the full-corpus selection (tested).
+  For new text it may not: on 60 hand-written climate claims that played no part in building
+  the index (`scripts/free_text_claims.py`), it picked the same passages as the full 1.19M
+  search 39 times (35 of 52 on the filtered path, 4 of 8 on the fallback path). The Try-it page
+  says on every result whether the selection is verified or comes from the subset.
 - **Retrieval runs** (saved 2024, submitted rule, notebook rule, notebook final cell) with
   scores and per-claim P/R/F, plus threshold sweeps.
 - **Predictions** under three protocols, training histories (the 2024 log parsed from the notebook
@@ -155,7 +170,7 @@ The database contains:
   token table.
 
 `web/src/lib/__fixtures__/` holds Python ground truth for the parity tests (preprocessing,
-Porter stems, numpy argsort).
+Porter stems, numpy argsort, and the full-corpus selections for the free-text claims).
 
 ## Credits
 
@@ -173,7 +188,8 @@ The evidence passages are Wikipedia sentences.
 
 The original submission is preserved unchanged in [`coursework/`](coursework/) for reference.
 It holds the notebook and the team's report. The assignment specification is paraphrased here,
-not reproduced, and the full course corpus is not redistributed. The site serves only derived
+not reproduced, and neither the full course corpus nor the train and test claim texts are
+redistributed. The site serves only derived
 artefacts and the pruned index needed for the demo. Current students of COMP90042 should not
 copy this work.
 
