@@ -13,13 +13,13 @@ export const RUNS: Record<RunId, { title: string; short: string; description: st
     title: "2024 submission",
     short: "2024 saved",
     description:
-      "The passages the team actually retrieved and submitted in 2024 (their saved output file).",
+      "The passages the team actually retrieved and submitted in 2024 (their saved output file). The file records only passage ids, so scores are recomputed with the submission rule.",
   },
   submission: {
     title: "Re-run: submission rule",
     short: "Re-run",
     description:
-      "The retrieval rule re-run in 2026 over all 1.19M passages, scoring sim + overlap. It reproduces the saved 2024 lists up to the order of exactly tied scores.",
+      "The retrieval rule re-run in 2026 over all 1.19M passages, scoring sim + overlap. Over the 307 dev and test claims it returns passages with the same scores as the saved 2024 lists for 303 (the very same passages for 244; the rest differ only in which exactly tied passage was kept). 4 saved lists are not explained by the rule.",
   },
   notebook: {
     title: "Re-run: notebook rule",
@@ -97,8 +97,9 @@ export type RetrievedPassage = EvidencePassage & {
 
 export type RunSummary = {
   run: RunId;
-  path: "filtered" | "fallback";
-  nFiltered: number;
+  /** null for the saved 2024 list: the file records only the ids, not how they were selected */
+  path: "filtered" | "fallback" | null;
+  nFiltered: number | null;
   nRetrieved: number;
   nCorrect: number | null;
   precision: number | null;
@@ -170,6 +171,11 @@ export type CheckResponse = {
     path: "filtered" | "fallback";
     nFiltered: number;
     indexSize: number;
+    /**
+     * True when the claim's tags are those of a dataset claim or a Try-it example whose
+     * full-corpus selection was checked against the pruned index at build time.
+     */
+    verified: boolean;
     tookMs: number;
     passages: (EvidencePassage & {
       sim: number;

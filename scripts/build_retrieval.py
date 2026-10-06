@@ -12,7 +12,7 @@
 """Step 1 - re-run the ORIGINAL TF-IDF evidence retrieval over the full corpus.
 
 Inputs (in ``.cache/data``, see ``scripts/fetch_data.py``):
-  dev-claims.json, test-claims-unlabelled.json
+  train-claims.json, dev-claims.json, test-claims-unlabelled.json
   processed_evidence.csv        evidence_id, evidence_text, evidence_tags (team artefact)
   evidence_tfidf.pkl            tag TF-IDF matrix of processed_evidence (team artefact)
   tfidf_tag_vectorizer.pkl      the "targeted" tag vectorizer (team artefact)
@@ -25,6 +25,10 @@ and a per-claim candidate *pool* (every passage that passes the filter plus ever
 passage tied with or above the top-n fallback scores). ``build_web_data.py`` puts
 the pools into the web app's pruned index, so the TypeScript port re-running the
 rule over the pruned index selects the same passages as this full-corpus run.
+The pools of the 1,228 train claims and of the Try-it examples
+(``free_text_claims.EXAMPLES``) are added too, and the held-out free-text claims
+(``free_text_claims.HELDOUT``) are run over the full corpus so the web build can
+measure how often the pruned index agrees with it on claims nobody planned for.
 
 Two configurations exist because the notebook committed to GitHub is not the code
 that produced the reported numbers:
@@ -34,9 +38,14 @@ that produced the reported numbers:
                    combined>1.5.
 * ``submission`` - reconstructed from the saved 2024 outputs: combined = sim +
                    overlap with the sim>0.55 / overlap>0.5 filter (no binding
-                   combined threshold). It reproduces every saved dev and test
-                   selection up to the order of exactly tied scores, and the
-                   reported dev F-score.
+                   combined threshold). It reproduces the reported dev F-score
+                   exactly. Over the 307 dev + test claims it returns passages with
+                   the same scores as the saved lists for 303 (the very same
+                   passages for 244; the other 59 differ only in which of several
+                   exactly tied passages was kept). The 4 remaining saved lists
+                   (``parity.submission_unexplained``) look like top-6 fallback
+                   lists although passages pass the filter, which suggests some
+                   extra 2024 logic that is not in the notebook.
 
 ``find_top_evidence`` spends ~3 s per claim in ``pandas.apply``; the overlap
 columns are computed with an inverted index instead and fed through the
@@ -58,6 +67,7 @@ import pandas as pd
 from sklearn.metrics.pairwise import cosine_similarity
 
 import original as O
+from free_text_claims import EXAMPLES, HELDOUT
 
 BUILD = O.CACHE / "build"
 BUILD.mkdir(parents=True, exist_ok=True)
@@ -214,6 +224,7 @@ def main():
     args = ap.parse_args()
 
     t0 = time.time()
+    train = O.load_claims("train-claims.json")
     dev = O.load_claims("dev-claims.json")
     test = O.load_claims("test-claims-unlabelled.json")
     saved = {"dev": O.load_claims("evidence_ret.json"), "test": O.load_claims("test-with-retrieved-evidences.json")}
@@ -281,6 +292,50 @@ def main():
             if i % 25 == 0:
                 print(f"{split} {i}/{len(claims)}  {time.time() - t0:.0f}s", flush=True)
 
+    # ---- 2b. widen the pruned index: pools of the train claims and the Try-it examples --
+    def pool_of(sim, ov):
+        keep: set[int] = set()
+        for cfg in CONFIGS.values():
+            keep |= fast.pool(sim, ov, cfg["sim_weight"], cfg["top_n"], cfg["t_sim"], cfg["t_overlap"],
+                              cfg["t_combined"])
+        return keep
+
+    train_pool: set[int] = set()
+    train_runs = {}  # full-corpus selections, so build_web_data.py can check the pruned index
+    for i, (cid, c) in enumerate(train.items()):
+        tags = claim_tags_of(c["claim_text"])
+        if tags:  # a claim made only of stopwords has no tags (the rule would divide by zero)
+            sim, ov, cnt = fast.features(tags)
+            train_pool |= pool_of(sim, ov)
+            train_runs[cid] = {"tags": tags}
+            for name, cfg in CONFIGS.items():
+                path, _, rows = fast.select(sim, ov, cnt, **cfg)
+                train_runs[cid][name] = {"ids": rows["evidence_id"].tolist(), "path": path,
+                                         "scores": [{"combined": float(x)} for x in rows["combined_score"]]}
+        if i % 200 == 0:
+            print(f"train pools {i}/{len(train)}  {time.time() - t0:.0f}s", flush=True)
+
+    def free_text_run(text):
+        tags = claim_tags_of(text)
+        sim, ov, cnt = fast.features(tags)
+        row = {"text": text, "tags": tags}
+        for name, cfg in CONFIGS.items():
+            path, n_filtered, rows = fast.select(sim, ov, cnt, **cfg)
+            row[name] = {"ids": rows["evidence_id"].tolist(), "path": path, "n_filtered": n_filtered,
+                         "scores": scored_rows(rows)}
+        return row, pool_of(sim, ov)
+
+    example_pool: set[int] = set()
+    free_text = {"examples": [], "heldout": []}
+    for ex in EXAMPLES:
+        row, pool = free_text_run(ex["text"])
+        free_text["examples"].append({**row, "note": ex["note"], "expect": ex["expect"]})
+        example_pool |= pool
+    for text in HELDOUT:
+        free_text["heldout"].append(free_text_run(text)[0])  # its pool is NOT added to the index
+    ids_of = lambda positions: sorted(fast.df["evidence_id"].iloc[sorted(positions)].tolist())
+    print(f"train pools: {len(train_pool):,} passages; example pools: {len(example_pool):,}", flush=True)
+
     # ---- 3. parity with the saved 2024 outputs ------------------------------
     parity = {"verify_fast_vs_verbatim": verify}
     for split in ("dev", "test"):
@@ -294,8 +349,16 @@ def main():
             for s, r in zip(sub, rows)
         )
         nb_exact = sum(r["notebook"]["ids"] == r["saved_2024"] for r in rows)
+        unexplained = [
+            cid for cid, r in out[split].items()
+            if not (len(r["submission"]["ids"]) == len(r["saved_2024"]) and np.allclose(
+                sorted(x["combined"] for x in r["submission"]["scores"]), sorted(r["saved_2024_combined"]),
+                atol=1e-12))
+        ]
+        assert len(unexplained) == len(out[split]) - tie_equiv
         parity[split] = {"total": len(out[split]), "submission_exact": exact, "submission_same_set": same_set,
-                         "submission_equal_up_to_ties": tie_equiv, "notebook_exact": nb_exact}
+                         "submission_equal_up_to_ties": tie_equiv, "notebook_exact": nb_exact,
+                         "submission_unexplained": unexplained}
     print("parity", json.dumps({k: v for k, v in parity.items() if k != "verify_fast_vs_verbatim"}), flush=True)
 
     dv = list(out["dev"].values())
@@ -338,7 +401,9 @@ def main():
 
     with open(BUILD / "retrieval.json", "w") as f:
         json.dump({"configs": CONFIGS, "dev": out["dev"], "test": out["test"], "parity": parity,
-                   "metrics": metrics, "sweeps": sweeps, "corpus_rows": int(len(evidence_df))}, f)
+                   "metrics": metrics, "sweeps": sweeps, "corpus_rows": int(len(evidence_df)),
+                   "train": train_runs, "train_pool": ids_of(train_pool), "example_pool": ids_of(example_pool),
+                   "free_text": free_text}, f)
     print(f"wrote {BUILD / 'retrieval.json'} in {time.time() - t0:.0f}s", flush=True)
 
 

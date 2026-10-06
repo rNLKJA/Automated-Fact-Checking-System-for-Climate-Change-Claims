@@ -39,6 +39,8 @@ export type RetrievalParity = Record<
     submission_same_set: number;
     submission_equal_up_to_ties: number;
     notebook_exact: number;
+    /** claims whose saved 2024 list the submission rule does not reproduce */
+    submission_unexplained: string[];
   }
 >;
 
@@ -62,6 +64,7 @@ export type IndexInfo = {
   retrievable: number;
   gold: number;
   pool: number;
+  examples: number;
   sample: number;
   sample_seed: number;
   corpus_rows: number;
@@ -91,6 +94,25 @@ export type ModelInfo = {
   lr: number;
   optimizer: string;
 };
+
+/** A one-click example on the Try-it page; its note is checked against the full-corpus run. */
+export type TryExample = { text: string; note: string; tags: string };
+
+/** How often the pruned index picks the same passages as the full corpus for held-out free text. */
+export type FreeTextParity = {
+  claims: number;
+} & Record<
+  RuleId,
+  { agree: number; by_path: Record<"filtered" | "fallback", [agree: number, total: number]> }
+>;
+
+export function tryExamples(): TryExample[] {
+  return getMeta<TryExample[]>("try_examples");
+}
+
+export function freeTextParity(): FreeTextParity {
+  return getMeta<FreeTextParity>("free_text_parity");
+}
 
 export function getOverview() {
   return {

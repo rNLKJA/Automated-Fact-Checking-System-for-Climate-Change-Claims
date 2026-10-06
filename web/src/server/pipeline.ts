@@ -6,8 +6,9 @@ import { tfidfTransform } from "@/lib/tfidf";
 import { preprocessAndTokenize, preprocessTrace } from "@/lib/text/preprocess";
 import { pySplit } from "@/lib/text/pystr";
 import type { CheckResponse } from "@/lib/types";
-import { getEvidence, goldClaimsFor } from "./claims";
+import { getEvidence, goldClaimsFor, isIndexExact } from "./claims";
 import { getClassifier, getEvidenceIndex, getTagModel } from "./models";
+import { tryExamples } from "./stats";
 
 /**
  * The whole 2024 system for one free-text claim:
@@ -66,6 +67,7 @@ export function checkClaim(claim: string, ruleId: RuleId = "submission"): CheckR
       path: selection.path,
       nFiltered: selection.nFiltered,
       indexSize: index.length,
+      verified: tryExamples().some((ex) => ex.tags === claimTags) || isIndexExact(claimTags),
       tookMs,
       passages: selection.selected.map((s, i) => {
         const p = passages[i];

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import freeText from "@/lib/__fixtures__/free-text.json";
 import { EmptyClaimError } from "@/lib/retrieval";
 import { getDb } from "./db";
 import { checkClaim } from "./pipeline";
@@ -33,12 +34,23 @@ describe("checkClaim (Try-it pipeline)", () => {
       ),
     ).toBe(true);
     expect(r.classification.label).toBe(single.label);
+    expect(r.retrieval.verified).toBe(true);
     expect(r.classification.probs.reduce((a, b) => a + b, 0)).toBeCloseTo(1, 10);
     expect(r.classification.inputTokens + r.classification.padding).toBe(128);
   });
 
   it("rejects claims made only of stopwords, where the original would divide by zero", () => {
     expect(() => checkClaim("They were not there, were they?")).toThrow(EmptyClaimError);
+  });
+
+  it("marks the examples as verified and other free text as not", () => {
+    for (const ex of freeText.examples) {
+      const r = checkClaim(ex.text);
+      expect(r.retrieval.verified, ex.text).toBe(true);
+      expect(r.retrieval.path).toBe(ex.submission.path);
+    }
+    const unseen = checkClaim(freeText.heldout[0].text);
+    expect(unseen.retrieval.verified).toBe(false);
   });
 
   it("supports the committed-notebook scoring rule", () => {

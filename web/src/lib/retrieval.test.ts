@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { getDb, getMeta } from "@/server/db";
+import freeText from "./__fixtures__/free-text.json";
 import { getEvidenceIndex, getTagModel } from "@/server/models";
 import { evidenceScore, mean } from "./metrics";
 import {
@@ -109,14 +110,18 @@ describe("parity with the full-corpus Python run (pruned index)", () => {
     "SELECT evidence_id FROM claim_evidence WHERE claim_id = ? ORDER BY rank",
   );
 
-  it("computes every claim's tags exactly like Python", () => {
-    const all = db.prepare("SELECT claim_text, tags FROM claims").all() as {
+  it("computes every dev claim's tags exactly like Python", () => {
+    // only dev claims carry their text; train/test keep the derived tags
+    const all = db
+      .prepare("SELECT claim_text, tags FROM claims WHERE claim_text IS NOT NULL")
+      .all() as {
       claim_text: string;
       tags: string;
     }[];
     const bad = all.filter((c) => claimTagsOf(c.claim_text, preprocessAndTokenize) !== c.tags);
     expect(bad.slice(0, 3)).toEqual([]);
-    expect(all).toHaveLength(1228 + 154 + 153);
+    expect(all).toHaveLength(154);
+    expect(db.prepare("SELECT COUNT(*) AS n FROM claims").get()).toEqual({ n: 1228 + 154 + 153 });
   });
 
   it("reproduces notebook cell 26 for claim-752", () => {
@@ -178,4 +183,62 @@ describe("parity with the full-corpus Python run (pruned index)", () => {
       expect(mean(fDev)).toBeCloseTo(expected[run], 12);
     }, 120_000);
   }
+});
+
+type FullRun = { ids: string[]; path: "filtered" | "fallback"; combined: number[] };
+type FreeTextCase = { text: string; tags: string } & Record<RuleId, FullRun>;
+
+/** Does the pruned index pick what the full 1.19M-passage Python run picked? */
+function agreesWithFullCorpus(c: FreeTextCase, rule: RuleId): boolean {
+  const ts = findTopEvidence(
+    c.tags,
+    getTagModel(),
+    preprocessAndTokenize,
+    getEvidenceIndex(),
+    RULES[rule],
+  );
+  const full = c[rule];
+  return (
+    ts.path === full.path &&
+    equalUpToTies(
+      ts.selected.map((x) => ({ evidence_id: x.evidenceId, combined: x.combined })),
+      full.ids.map((id, i) => ({ evidence_id: id, combined: full.combined[i] })),
+    )
+  );
+}
+
+describe("free-text claims vs the full-corpus Python run", () => {
+  const rules: RuleId[] = ["submission", "notebook"];
+
+  it("returns the full-corpus selection for every Try-it example", () => {
+    const examples = getMeta<{ text: string; tags: string }[]>("try_examples");
+    expect(examples.map((e) => e.text)).toEqual(freeText.examples.map((e) => e.text));
+    for (const c of freeText.examples as FreeTextCase[]) {
+      expect(claimTagsOf(c.text, preprocessAndTokenize)).toBe(c.tags);
+      for (const rule of rules)
+        expect(agreesWithFullCorpus(c, rule), `${c.text} (${rule})`).toBe(true);
+    }
+  });
+
+  it("agrees with it on held-out claims exactly as often as the site says", () => {
+    const parity = getMeta<
+      { claims: number } & Record<
+        RuleId,
+        { agree: number; by_path: Record<"filtered" | "fallback", [number, number]> }
+      >
+    >("free_text_parity");
+    const heldout = freeText.heldout as FreeTextCase[];
+    expect(parity.claims).toBe(heldout.length);
+    for (const rule of rules) {
+      const byPath = { filtered: [0, 0], fallback: [0, 0] };
+      for (const c of heldout) {
+        expect(claimTagsOf(c.text, preprocessAndTokenize)).toBe(c.tags);
+        const ok = agreesWithFullCorpus(c, rule);
+        byPath[c[rule].path][0] += Number(ok);
+        byPath[c[rule].path][1] += 1;
+      }
+      expect(byPath).toEqual(parity[rule].by_path);
+      expect(byPath.filtered[0] + byPath.fallback[0]).toBe(parity[rule].agree);
+    }
+  }, 60_000);
 });

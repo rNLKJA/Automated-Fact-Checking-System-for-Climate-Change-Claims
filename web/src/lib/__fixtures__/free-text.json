@@ -1,0 +1,2096 @@
+{
+ "examples": [
+  {
+   "text": "Arctic sea ice has been shrinking for decades.",
+   "tags": "arctic decad ice sea shrink",
+   "submission": {
+    "ids": [
+     "evidence-79261"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.6160867138714021
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-79261"
+    ],
+    "path": "filtered",
+    "combined": [
+     2.4321734277428044
+    ]
+   }
+  },
+  {
+   "text": "Antarctica is gaining ice, not losing it.",
+   "tags": "antarctica gain ice lose",
+   "submission": {
+    "ids": [
+     "evidence-529248"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.8491663103212437
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-529248"
+    ],
+    "path": "filtered",
+    "combined": [
+     2.6983326206424874
+    ]
+   }
+  },
+  {
+   "text": "Carbon dioxide is a trace gas, so it cannot warm the planet.",
+   "tags": "carbon dioxid ga planet trace warm",
+   "submission": {
+    "ids": [
+     "evidence-1111704",
+     "evidence-889119"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.2948349734490474,
+     1.2677221905064018
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-1111704",
+     "evidence-889119"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.9230032802314283,
+     1.868777714346137
+    ]
+   }
+  },
+  {
+   "text": "[South Australia] has the most expensive electricity in the world.",
+   "tags": "australia electr expens south world",
+   "submission": {
+    "ids": [
+     "evidence-949564",
+     "evidence-67732",
+     "evidence-572512",
+     "evidence-808896"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.2744935759738267,
+     1.2050106593377183,
+     1.1995686949289006,
+     1.1954166814603124
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-949564",
+     "evidence-67732",
+     "evidence-572512",
+     "evidence-808896"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.9489871519476534,
+     1.8100213186754366,
+     1.7991373898578011,
+     1.7908333629206248
+    ]
+   }
+  },
+  {
+   "text": "Wind turbines kill millions of birds every year.",
+   "tags": "bird everi kill million turbin wind year",
+   "submission": {
+    "ids": [
+     "evidence-724973"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.3395616508845025
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-724973"
+    ],
+    "path": "filtered",
+    "combined": [
+     2.107694730340434
+    ]
+   }
+  },
+  {
+   "text": "The Great Barrier Reef is in better shape than ever.",
+   "tags": "barrier better ever great reef shape",
+   "submission": {
+    "ids": [
+     "evidence-714813"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.5940662238360157
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-714813"
+    ],
+    "path": "filtered",
+    "combined": [
+     2.1881324476720314
+    ]
+   }
+  },
+  {
+   "text": "Climate scientists are in it for the grant money.",
+   "tags": "climat grant money scientist",
+   "submission": {
+    "ids": [
+     "evidence-271982",
+     "evidence-1202313",
+     "evidence-1190061",
+     "evidence-23008",
+     "evidence-836017",
+     "evidence-288390"
+    ],
+    "path": "fallback",
+    "combined": [
+     1.3121726628351382,
+     1.2245386119415111,
+     1.2245386119415111,
+     1.2245386119415111,
+     1.2245386119415111,
+     1.2245386119415111
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-271982",
+     "evidence-836017",
+     "evidence-1190061",
+     "evidence-288390",
+     "evidence-1202313",
+     "evidence-1003048"
+    ],
+    "path": "fallback",
+    "combined": [
+     2.1243453256702765,
+     1.9490772238830223,
+     1.9490772238830223,
+     1.9490772238830223,
+     1.9490772238830223,
+     1.9490772238830223
+    ]
+   }
+  }
+ ],
+ "heldout": [
+  {
+   "text": "Volcanoes emit more CO2 than humans.",
+   "tags": "emit human volcano",
+   "submission": {
+    "ids": [
+     "evidence-1180963",
+     "evidence-224855",
+     "evidence-699212",
+     "evidence-704302",
+     "evidence-1190928",
+     "evidence-1800"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.6666666666666665,
+     1.6666666666666665,
+     1.6666666666666665,
+     1.366043236866977,
+     1.2867931532850465,
+     1.2502892777428274
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-1180963",
+     "evidence-224855",
+     "evidence-699212",
+     "evidence-704302",
+     "evidence-1190928",
+     "evidence-1800"
+    ],
+    "path": "filtered",
+    "combined": [
+     2.6666666666666665,
+     2.6666666666666665,
+     2.6666666666666665,
+     2.065419807067287,
+     1.9069196399034265,
+     1.8339118888189883
+    ]
+   }
+  },
+  {
+   "text": "Hurricanes are getting stronger because of climate change.",
+   "tags": "chang climat get hurrican stronger",
+   "submission": {
+    "ids": [
+     "evidence-972624",
+     "evidence-115287",
+     "evidence-1055682"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.3766856067380844,
+     1.3080797423706456,
+     1.2686374352241492
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-972624",
+     "evidence-115287",
+     "evidence-1055682"
+    ],
+    "path": "filtered",
+    "combined": [
+     2.1533712134761687,
+     2.0161594847412916,
+     1.9372748704482983
+    ]
+   }
+  },
+  {
+   "text": "Sea levels are rising faster than ever",
+   "tags": "ever faster level rise sea",
+   "submission": {
+    "ids": [
+     "evidence-894712",
+     "evidence-568649",
+     "evidence-732643",
+     "evidence-1088298",
+     "evidence-1133838",
+     "evidence-663642"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.483247924857743,
+     1.4541822473714605,
+     1.4541822473714605,
+     1.4541822473714605,
+     1.4541822473714605,
+     1.4541822473714605
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-545691",
+     "evidence-568649",
+     "evidence-732643",
+     "evidence-1088298",
+     "evidence-1133838",
+     "evidence-663642"
+    ],
+    "path": "filtered",
+    "combined": [
+     2.308364494742921,
+     2.308364494742921,
+     2.308364494742921,
+     2.308364494742921,
+     2.308364494742921,
+     2.308364494742921
+    ]
+   }
+  },
+  {
+   "text": "Global warming stopped in 1998.",
+   "tags": "global stop warm",
+   "submission": {
+    "ids": [
+     "evidence-44184",
+     "evidence-563459",
+     "evidence-759896",
+     "evidence-7312",
+     "evidence-666222",
+     "evidence-275823"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.6666666666666665,
+     1.6666666666666665,
+     1.6666666666666665,
+     1.6666666666666665,
+     1.6666666666666665,
+     1.6666666666666665
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-44184",
+     "evidence-563459",
+     "evidence-759896",
+     "evidence-7312",
+     "evidence-666222",
+     "evidence-275823"
+    ],
+    "path": "filtered",
+    "combined": [
+     2.6666666666666665,
+     2.6666666666666665,
+     2.6666666666666665,
+     2.6666666666666665,
+     2.6666666666666665,
+     2.6666666666666665
+    ]
+   }
+  },
+  {
+   "text": "Polar bear populations are increasing.",
+   "tags": "bear increas polar popul",
+   "submission": {
+    "ids": [
+     "evidence-432987"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.381168773109432
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-432987"
+    ],
+    "path": "filtered",
+    "combined": [
+     2.012337546218864
+    ]
+   }
+  },
+  {
+   "text": "The sun is causing global warming.",
+   "tags": "caus global sun warm",
+   "submission": {
+    "ids": [
+     "evidence-90274",
+     "evidence-430265"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.6249279266685168,
+     1.422310061311591
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-90274",
+     "evidence-430265"
+    ],
+    "path": "filtered",
+    "combined": [
+     2.4998558533370336,
+     2.094620122623182
+    ]
+   }
+  },
+  {
+   "text": "Climate models have failed to predict the observed warming.",
+   "tags": "climat fail model observ predict warm",
+   "submission": {
+    "ids": [
+     "evidence-928328",
+     "evidence-964047",
+     "evidence-26359",
+     "evidence-1040115"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.3237998652264729,
+     1.2362597612610045,
+     1.2362597612610045,
+     1.2246510054225976
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-928328",
+     "evidence-964047",
+     "evidence-26359",
+     "evidence-1040115"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.9809330637862792,
+     1.8058528558553424,
+     1.8058528558553424,
+     1.7826353441785288
+    ]
+   }
+  },
+  {
+   "text": "Renewable energy is more expensive than coal.",
+   "tags": "coal energi expens renew",
+   "submission": {
+    "ids": [
+     "evidence-1133033",
+     "evidence-175794",
+     "evidence-658638",
+     "evidence-755639",
+     "evidence-887501",
+     "evidence-643056"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.75,
+     1.75,
+     1.75,
+     1.5185205029806736,
+     1.3078745107228276,
+     1.3072909343491932
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-1133033",
+     "evidence-175794",
+     "evidence-658638",
+     "evidence-755639",
+     "evidence-887501",
+     "evidence-643056"
+    ],
+    "path": "filtered",
+    "combined": [
+     2.75,
+     2.75,
+     2.75,
+     2.2870410059613473,
+     1.8657490214456551,
+     1.8645818686983864
+    ]
+   }
+  },
+  {
+   "text": "Methane is a more potent greenhouse gas than carbon dioxide.",
+   "tags": "carbon dioxid ga greenhous methan potent",
+   "submission": {
+    "ids": [
+     "evidence-222070"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.6259019020237977
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-222070"
+    ],
+    "path": "filtered",
+    "combined": [
+     2.418470470714262
+    ]
+   }
+  },
+  {
+   "text": "Glaciers around the world are retreating.",
+   "tags": "around glacier retreat world",
+   "submission": {
+    "ids": [
+     "evidence-447718",
+     "evidence-1166628"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.6424116759602922,
+     1.6424116759602922
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-447718",
+     "evidence-1166628"
+    ],
+    "path": "filtered",
+    "combined": [
+     2.2848233519205845,
+     2.2848233519205845
+    ]
+   }
+  },
+  {
+   "text": "Ocean acidification is harming coral reefs.",
+   "tags": "acidif coral harm ocean reef",
+   "submission": {
+    "ids": [
+     "evidence-175657",
+     "evidence-851221"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.8,
+     1.502109062533452
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-175657",
+     "evidence-851221"
+    ],
+    "path": "filtered",
+    "combined": [
+     2.8,
+     2.204218125066904
+    ]
+   }
+  },
+  {
+   "text": "There is no scientific consensus on climate change.",
+   "tags": "chang climat consensu scientif",
+   "submission": {
+    "ids": [
+     "evidence-530108",
+     "evidence-389631",
+     "evidence-295756",
+     "evidence-1111410",
+     "evidence-154961",
+     "evidence-1143450"
+    ],
+    "path": "filtered",
+    "combined": [
+     2.0,
+     1.873104670181811,
+     1.8661520088697627,
+     1.8475759518313573,
+     1.8209578994575866,
+     1.7229693154241574
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-530108",
+     "evidence-389631",
+     "evidence-295756",
+     "evidence-1111410",
+     "evidence-154961",
+     "evidence-1143450"
+    ],
+    "path": "filtered",
+    "combined": [
+     3.0,
+     2.746209340363622,
+     2.7323040177395255,
+     2.6951519036627145,
+     2.641915798915173,
+     2.445938630848315
+    ]
+   }
+  },
+  {
+   "text": "The Medieval Warm Period was warmer than today.",
+   "tags": "mediev period today warm warmer",
+   "submission": {
+    "ids": [
+     "evidence-820057"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.7172385238547998
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-820057"
+    ],
+    "path": "filtered",
+    "combined": [
+     2.4344770477095996
+    ]
+   }
+  },
+  {
+   "text": "CO2 is plant food, so more of it is good for crops.",
+   "tags": "crop food good plant",
+   "submission": {
+    "ids": [
+     "evidence-563610",
+     "evidence-390397"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.3855000677525933,
+     1.3000069860894885
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-563610",
+     "evidence-390397"
+    ],
+    "path": "filtered",
+    "combined": [
+     2.0210001355051865,
+     1.850013972178977
+    ]
+   }
+  },
+  {
+   "text": "Electric cars produce more emissions than petrol cars.",
+   "tags": "car car electr emiss petrol produc",
+   "submission": {
+    "ids": [
+     "evidence-533801",
+     "evidence-246647",
+     "evidence-633825",
+     "evidence-87967",
+     "evidence-195385",
+     "evidence-915965"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.449641434899526,
+     1.3306858845604865,
+     1.301707148380702,
+     1.2814854480521465,
+     1.249350381588269,
+     1.2190471425027476
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-533801",
+     "evidence-246647",
+     "evidence-633825",
+     "evidence-87967",
+     "evidence-195385",
+     "evidence-915965"
+    ],
+    "path": "filtered",
+    "combined": [
+     2.2992828697990517,
+     2.0613717691209734,
+     2.003414296761404,
+     1.962970896104293,
+     1.8987007631765378,
+     1.838094285005495
+    ]
+   }
+  },
+  {
+   "text": "Australia's bushfires were caused by arsonists, not climate change.",
+   "tags": "arsonist australia bushfir caus chang climat",
+   "submission": {
+    "ids": [
+     "evidence-230078",
+     "evidence-914730",
+     "evidence-256037",
+     "evidence-864757",
+     "evidence-1054845",
+     "evidence-492503"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.705819055339938,
+     1.705819055339938,
+     1.705819055339938,
+     1.705819055339938,
+     1.705819055339938,
+     1.3724857220066045
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-230078",
+     "evidence-914730",
+     "evidence-256037",
+     "evidence-864757",
+     "evidence-1054845",
+     "evidence-492503"
+    ],
+    "path": "filtered",
+    "combined": [
+     2.411638110679876,
+     2.411638110679876,
+     2.411638110679876,
+     2.411638110679876,
+     2.411638110679876,
+     2.0783047773465424
+    ]
+   }
+  },
+  {
+   "text": "Droughts are becoming more frequent in Africa.",
+   "tags": "africa becom drought frequent",
+   "submission": {
+    "ids": [
+     "evidence-877779"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.721865075592579
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-877779"
+    ],
+    "path": "filtered",
+    "combined": [
+     2.443730151185158
+    ]
+   }
+  },
+  {
+   "text": "The ozone hole causes global warming.",
+   "tags": "caus global hole ozon warm",
+   "submission": {
+    "ids": [
+     "evidence-363469",
+     "evidence-407459",
+     "evidence-453529",
+     "evidence-35625",
+     "evidence-1188759",
+     "evidence-614890"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.3756836587467483,
+     1.3756836587467483,
+     1.3756836587467483,
+     1.3756836587467483,
+     1.3756836587467483,
+     1.3756836587467483
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-363469",
+     "evidence-407459",
+     "evidence-453529",
+     "evidence-35625",
+     "evidence-1188759",
+     "evidence-614890"
+    ],
+    "path": "filtered",
+    "combined": [
+     2.08470065082683,
+     2.08470065082683,
+     2.08470065082683,
+     2.08470065082683,
+     2.08470065082683,
+     2.08470065082683
+    ]
+   }
+  },
+  {
+   "text": "Water vapour is the most important greenhouse gas.",
+   "tags": "ga greenhous import vapour water",
+   "submission": {
+    "ids": [
+     "evidence-1072890",
+     "evidence-757301",
+     "evidence-917162",
+     "evidence-173869"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.690560634532583,
+     1.690560634532583,
+     1.690560634532583,
+     1.690560634532583
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-1072890",
+     "evidence-757301",
+     "evidence-917162",
+     "evidence-173869"
+    ],
+    "path": "filtered",
+    "combined": [
+     2.381121269065166,
+     2.381121269065166,
+     2.381121269065166,
+     2.381121269065166
+    ]
+   }
+  },
+  {
+   "text": "Nuclear power produces no carbon emissions.",
+   "tags": "carbon emiss nuclear power produc",
+   "submission": {
+    "ids": [
+     "evidence-334578",
+     "evidence-213098",
+     "evidence-705397",
+     "evidence-1017329",
+     "evidence-963305",
+     "evidence-748701"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.4866892362664652,
+     1.4542688501281833,
+     1.368046192564321,
+     1.293526476065598,
+     1.2908095578535685,
+     1.2622989591349918
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-334578",
+     "evidence-213098",
+     "evidence-705397",
+     "evidence-1017329",
+     "evidence-963305",
+     "evidence-748701"
+    ],
+    "path": "filtered",
+    "combined": [
+     2.3733784725329308,
+     2.308537700256367,
+     2.1360923851286424,
+     1.987052952131196,
+     1.981619115707137,
+     1.9245979182699837
+    ]
+   }
+  },
+  {
+   "text": "Deforestation in the Amazon releases huge amounts of carbon.",
+   "tags": "amazon amount carbon deforest huge releas",
+   "submission": {
+    "ids": [
+     "evidence-1196424",
+     "evidence-344221",
+     "evidence-890671",
+     "evidence-409517",
+     "evidence-711638",
+     "evidence-392220"
+    ],
+    "path": "fallback",
+    "combined": [
+     1.296863781266522,
+     1.296863781266522,
+     1.1950618738670578,
+     1.1666666666666667,
+     1.1666666666666667,
+     1.1666666666666667
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-409517",
+     "evidence-711638",
+     "evidence-392220",
+     "evidence-1196424",
+     "evidence-344221",
+     "evidence-90096"
+    ],
+    "path": "fallback",
+    "combined": [
+     2.166666666666667,
+     2.166666666666667,
+     2.166666666666667,
+     2.093727562533044,
+     2.093727562533044,
+     2.0706696194307144
+    ]
+   }
+  },
+  {
+   "text": "Greenland's ice sheet is melting at an accelerating rate.",
+   "tags": "acceler greenland ice melt rate sheet",
+   "submission": {
+    "ids": [
+     "evidence-392335",
+     "evidence-691825",
+     "evidence-714996",
+     "evidence-719161"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.3734755172149982,
+     1.3734755172149982,
+     1.3734755172149982,
+     1.2922587832565489
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-392335",
+     "evidence-691825",
+     "evidence-714996",
+     "evidence-719161"
+    ],
+    "path": "filtered",
+    "combined": [
+     2.08028436776333,
+     2.08028436776333,
+     2.08028436776333,
+     1.917850899846431
+    ]
+   }
+  },
+  {
+   "text": "Extreme heatwaves have become more common since the 1950s.",
+   "tags": "becom common extrem heatwav sinc",
+   "submission": {
+    "ids": [
+     "evidence-1000661",
+     "evidence-153058",
+     "evidence-1035296",
+     "evidence-283964"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.46411971338434,
+     1.3789226139758886,
+     1.328188768681521,
+     1.2499253147619753
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-1000661",
+     "evidence-153058",
+     "evidence-1035296",
+     "evidence-283964"
+    ],
+    "path": "filtered",
+    "combined": [
+     2.32823942676868,
+     2.157845227951777,
+     2.0563775373630424,
+     1.8998506295239508
+    ]
+   }
+  },
+  {
+   "text": "Cosmic rays control the Earth's climate.",
+   "tags": "climat control cosmic earth ray",
+   "submission": {
+    "ids": [
+     "evidence-611285",
+     "evidence-617443"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.176534693579967,
+     1.176534693579967
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-611285",
+     "evidence-617443"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.7530693871599339,
+     1.7530693871599339
+    ]
+   }
+  },
+  {
+   "text": "The Paris Agreement aims to limit warming to 1.5 degrees.",
+   "tags": "agreement aim degre limit pari warm",
+   "submission": {
+    "ids": [
+     "evidence-779732"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.5851429896132363
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-779732"
+    ],
+    "path": "filtered",
+    "combined": [
+     2.1702859792264726
+    ]
+   }
+  },
+  {
+   "text": "Solar panels take more energy to make than they ever produce.",
+   "tags": "energi ever make panel produc solar take",
+   "submission": {
+    "ids": [
+     "evidence-68802"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.199962434012856
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-68802"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.8284962965971405
+    ]
+   }
+  },
+  {
+   "text": "Permafrost thaw could release large amounts of methane.",
+   "tags": "amount could larg methan permafrost releas thaw",
+   "submission": {
+    "ids": [
+     "evidence-394121"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.5874912535941959
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-394121"
+    ],
+    "path": "filtered",
+    "combined": [
+     2.1749825071883917
+    ]
+   }
+  },
+  {
+   "text": "The Gulf Stream is slowing down.",
+   "tags": "gulf slow stream",
+   "submission": {
+    "ids": [
+     "evidence-66164",
+     "evidence-263305",
+     "evidence-1111766",
+     "evidence-569628",
+     "evidence-540478",
+     "evidence-1025162"
+    ],
+    "path": "fallback",
+    "combined": [
+     1.0,
+     0.6666666666666666,
+     0.6666666666666666,
+     0.6666666666666666,
+     0.6666666666666666,
+     0.6666666666666666
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-66164",
+     "evidence-263305",
+     "evidence-1111766",
+     "evidence-569628",
+     "evidence-540478",
+     "evidence-1025162"
+    ],
+    "path": "fallback",
+    "combined": [
+     1.0,
+     0.6666666666666666,
+     0.6666666666666666,
+     0.6666666666666666,
+     0.6666666666666666,
+     0.6666666666666666
+    ]
+   }
+  },
+  {
+   "text": "China emits more carbon dioxide than any other country.",
+   "tags": "carbon china countri dioxid emit",
+   "submission": {
+    "ids": [
+     "evidence-692879",
+     "evidence-830714",
+     "evidence-857215",
+     "evidence-779885",
+     "evidence-869571",
+     "evidence-930786"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.4223687585276954,
+     1.2780059720195938,
+     1.2254263890850905,
+     1.2254263890850905,
+     1.2254263890850905,
+     1.2254263890850905
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-692879",
+     "evidence-830714",
+     "evidence-857215",
+     "evidence-779885",
+     "evidence-869571",
+     "evidence-930786"
+    ],
+    "path": "filtered",
+    "combined": [
+     2.2447375170553907,
+     1.9560119440391874,
+     1.850852778170181,
+     1.850852778170181,
+     1.850852778170181,
+     1.850852778170181
+    ]
+   }
+  },
+  {
+   "text": "Snowfall in winter proves global warming is a hoax.",
+   "tags": "global hoax prove snowfal warm winter",
+   "submission": {
+    "ids": [
+     "evidence-363469",
+     "evidence-407459",
+     "evidence-453529",
+     "evidence-35625",
+     "evidence-1188759",
+     "evidence-614890"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.3651284737657967,
+     1.3651284737657967,
+     1.3651284737657967,
+     1.3651284737657967,
+     1.3651284737657967,
+     1.3651284737657967
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-363469",
+     "evidence-407459",
+     "evidence-453529",
+     "evidence-35625",
+     "evidence-1188759",
+     "evidence-614890"
+    ],
+    "path": "filtered",
+    "combined": [
+     2.063590280864927,
+     2.063590280864927,
+     2.063590280864927,
+     2.063590280864927,
+     2.063590280864927,
+     2.063590280864927
+    ]
+   }
+  },
+  {
+   "text": "Temperatures were higher during the time of the dinosaurs.",
+   "tags": "dinosaur higher temperatur time",
+   "submission": {
+    "ids": [
+     "evidence-971485"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.4473731907219864
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-971485"
+    ],
+    "path": "filtered",
+    "combined": [
+     2.2280797147773064
+    ]
+   }
+  },
+  {
+   "text": "Human activity is responsible for most of the recent warming.",
+   "tags": "activ human recent respons warm",
+   "submission": {
+    "ids": [
+     "evidence-717146",
+     "evidence-889101",
+     "evidence-1070309",
+     "evidence-281484"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.4595927679804337,
+     1.2653291379970715,
+     1.203983939320948,
+     1.1617993090299623
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-717146",
+     "evidence-889101",
+     "evidence-1070309",
+     "evidence-281484"
+    ],
+    "path": "filtered",
+    "combined": [
+     2.3191855359608677,
+     1.9306582759941429,
+     1.8079678786418958,
+     1.7235986180599245
+    ]
+   }
+  },
+  {
+   "text": "Sea ice in the Antarctic reached a record low.",
+   "tags": "antarct ice low reach record sea",
+   "submission": {
+    "ids": [
+     "evidence-238494",
+     "evidence-352317"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.4812668564662723,
+     1.4236714800185792
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-238494",
+     "evidence-352317"
+    ],
+    "path": "filtered",
+    "combined": [
+     2.295867046265878,
+     2.180676293370492
+    ]
+   }
+  },
+  {
+   "text": "Coal power plants are the largest source of carbon emissions in the US.",
+   "tags": "carbon coal emiss largest plant power sourc us",
+   "submission": {
+    "ids": [
+     "evidence-30469"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.5475938798913011
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-30469"
+    ],
+    "path": "filtered",
+    "combined": [
+     2.3451877597826023
+    ]
+   }
+  },
+  {
+   "text": "Climate change will cause mass extinction of species.",
+   "tags": "caus chang climat extinct mass speci",
+   "submission": {
+    "ids": [
+     "evidence-1114518"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.372957290371494
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-1114518"
+    ],
+    "path": "filtered",
+    "combined": [
+     2.145914580742988
+    ]
+   }
+  },
+  {
+   "text": "Tropical cyclones are becoming less frequent.",
+   "tags": "becom cyclon frequent less tropic",
+   "submission": {
+    "ids": [
+     "evidence-753593"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.303107402759478
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-753593"
+    ],
+    "path": "filtered",
+    "combined": [
+     2.006214805518956
+    ]
+   }
+  },
+  {
+   "text": "Rising temperatures increase the spread of malaria.",
+   "tags": "increas malaria rise spread temperatur",
+   "submission": {
+    "ids": [
+     "evidence-268615",
+     "evidence-251634",
+     "evidence-1099066",
+     "evidence-339893",
+     "evidence-10239",
+     "evidence-567076"
+    ],
+    "path": "fallback",
+    "combined": [
+     1.2348927476998282,
+     1.2348927476998282,
+     1.2348927476998282,
+     1.2348927476998282,
+     1.2348927476998282,
+     1.2348927476998282
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-1099066",
+     "evidence-10239",
+     "evidence-251634",
+     "evidence-339893",
+     "evidence-164201",
+     "evidence-567076"
+    ],
+    "path": "fallback",
+    "combined": [
+     2.0697854953996564,
+     2.0697854953996564,
+     2.0697854953996564,
+     2.0697854953996564,
+     2.0697854953996564,
+     2.0697854953996564
+    ]
+   }
+  },
+  {
+   "text": "Wildfires in California are linked to climate change.",
+   "tags": "california chang climat link wildfir",
+   "submission": {
+    "ids": [
+     "evidence-776089"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.469762901385801
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-776089"
+    ],
+    "path": "filtered",
+    "combined": [
+     2.139525802771602
+    ]
+   }
+  },
+  {
+   "text": "The Little Ice Age ended because of solar activity.",
+   "tags": "activ age end ice littl solar",
+   "submission": {
+    "ids": [
+     "evidence-233437",
+     "evidence-211508",
+     "evidence-797867"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.4881150038794653,
+     1.4369675462625702,
+     1.396918208138763
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-233437",
+     "evidence-211508",
+     "evidence-797867"
+    ],
+    "path": "filtered",
+    "combined": [
+     2.3095633410922636,
+     2.207268425858474,
+     2.1271697496108595
+    ]
+   }
+  },
+  {
+   "text": "El Nino caused the record temperatures of 2016.",
+   "tags": "caus el nino record temperatur",
+   "submission": {
+    "ids": [
+     "evidence-525175",
+     "evidence-760152"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.3427298819465587,
+     1.2320907136854018
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-525175",
+     "evidence-760152"
+    ],
+    "path": "filtered",
+    "combined": [
+     2.018793097226451,
+     1.797514760704137
+    ]
+   }
+  },
+  {
+   "text": "Carbon taxes have reduced emissions in British Columbia.",
+   "tags": "british carbon columbia emiss reduc tax",
+   "submission": {
+    "ids": [
+     "evidence-752797",
+     "evidence-309979"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.4005165035366542,
+     1.4005165035366542
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-752797",
+     "evidence-309979"
+    ],
+    "path": "filtered",
+    "combined": [
+     2.134366340406642,
+     2.134366340406642
+    ]
+   }
+  },
+  {
+   "text": "Planting trees can offset all fossil fuel emissions.",
+   "tags": "emiss fossil fuel offset plant tree",
+   "submission": {
+    "ids": [
+     "evidence-1207310",
+     "evidence-848057",
+     "evidence-736088"
+    ],
+    "path": "filtered",
+    "combined": [
+     2.0,
+     1.526182082870424,
+     1.4873137095761835
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-1207310",
+     "evidence-848057",
+     "evidence-736088"
+    ],
+    "path": "filtered",
+    "combined": [
+     3.0,
+     2.3856974990741815,
+     2.3079607524857004
+    ]
+   }
+  },
+  {
+   "text": "Ice cores show CO2 lagged temperature in past climate changes.",
+   "tags": "chang climat core ice lag past show temperatur",
+   "submission": {
+    "ids": [
+     "evidence-276402",
+     "evidence-1108933"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.3911717529580372,
+     1.274006848863646
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-276402",
+     "evidence-1108933"
+    ],
+    "path": "filtered",
+    "combined": [
+     2.1823435059160743,
+     1.948013697727292
+    ]
+   }
+  },
+  {
+   "text": "The Netherlands is at risk from rising sea levels.",
+   "tags": "level netherland rise risk sea",
+   "submission": {
+    "ids": [
+     "evidence-894712",
+     "evidence-732643",
+     "evidence-568649",
+     "evidence-844529",
+     "evidence-279230",
+     "evidence-453013"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.6084209366492184,
+     1.6,
+     1.6,
+     1.6,
+     1.6,
+     1.6
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-568649",
+     "evidence-663642",
+     "evidence-732643",
+     "evidence-1088298",
+     "evidence-1133838",
+     "evidence-844529"
+    ],
+    "path": "filtered",
+    "combined": [
+     2.6000000000000005,
+     2.6000000000000005,
+     2.6000000000000005,
+     2.6000000000000005,
+     2.6000000000000005,
+     2.6000000000000005
+    ]
+   }
+  },
+  {
+   "text": "Earth has been cooling since 2016.",
+   "tags": "cool earth sinc",
+   "submission": {
+    "ids": [
+     "evidence-1073174"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.7832763218747347
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-1073174"
+    ],
+    "path": "filtered",
+    "combined": [
+     2.5665526437494695
+    ]
+   }
+  },
+  {
+   "text": "Atmospheric CO2 has passed 400 parts per million.",
+   "tags": "atmospher million part pass per",
+   "submission": {
+    "ids": [
+     "evidence-1190705",
+     "evidence-788947",
+     "evidence-602225",
+     "evidence-1133467",
+     "evidence-252580",
+     "evidence-785695"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.4529402273333851,
+     1.4529402273333851,
+     1.4529402273333851,
+     1.3679811026765964,
+     1.327360845909427,
+     1.2938039968619859
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-1190705",
+     "evidence-788947",
+     "evidence-602225",
+     "evidence-1133467",
+     "evidence-252580",
+     "evidence-785695"
+    ],
+    "path": "filtered",
+    "combined": [
+     2.30588045466677,
+     2.30588045466677,
+     2.30588045466677,
+     2.1359622053531933,
+     2.054721691818854,
+     1.9876079937239717
+    ]
+   }
+  },
+  {
+   "text": "Climate change is making floods worse in Pakistan.",
+   "tags": "chang climat flood make pakistan wors",
+   "submission": {
+    "ids": [
+     "evidence-230078",
+     "evidence-914730",
+     "evidence-256037",
+     "evidence-864757",
+     "evidence-1054845",
+     "evidence-492503"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.8227278145167807,
+     1.8227278145167807,
+     1.8227278145167807,
+     1.8227278145167807,
+     1.8227278145167807,
+     1.4893944811834474
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-230078",
+     "evidence-914730",
+     "evidence-256037",
+     "evidence-864757",
+     "evidence-1054845",
+     "evidence-1082891"
+    ],
+    "path": "filtered",
+    "combined": [
+     2.6454556290335614,
+     2.6454556290335614,
+     2.6454556290335614,
+     2.6454556290335614,
+     2.6454556290335614,
+     2.3121222957002283
+    ]
+   }
+  },
+  {
+   "text": "The hockey stick graph has been debunked.",
+   "tags": "debunk graph hockey stick",
+   "submission": {
+    "ids": [
+     "evidence-1107443",
+     "evidence-949961",
+     "evidence-341739"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.75,
+     1.436132255202276,
+     1.3169344694807472
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-1107443",
+     "evidence-949961",
+     "evidence-341739"
+    ],
+    "path": "filtered",
+    "combined": [
+     2.75,
+     2.122264510404552,
+     1.8838689389614944
+    ]
+   }
+  },
+  {
+   "text": "Satellite data show no warming in the lower troposphere.",
+   "tags": "data lower satellit show tropospher warm",
+   "submission": {
+    "ids": [
+     "evidence-494851",
+     "evidence-964047",
+     "evidence-26359"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.4686577761695085,
+     1.2273891804377524,
+     1.2273891804377524
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-494851",
+     "evidence-964047",
+     "evidence-26359"
+    ],
+    "path": "filtered",
+    "combined": [
+     2.2706488856723506,
+     1.7881116942088382,
+     1.7881116942088382
+    ]
+   }
+  },
+  {
+   "text": "Agriculture is a major source of nitrous oxide emissions.",
+   "tags": "agricultur emiss major nitrou oxid sourc",
+   "submission": {
+    "ids": [
+     "evidence-483108",
+     "evidence-313515",
+     "evidence-868905",
+     "evidence-1086048",
+     "evidence-984551",
+     "evidence-1008737"
+    ],
+    "path": "fallback",
+    "combined": [
+     1.2265304366767182,
+     1.1897058247162322,
+     1.1241428901068322,
+     1.102343827061423,
+     1.088180598806077,
+     1.088180598806077
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-483108",
+     "evidence-313515",
+     "evidence-1008737",
+     "evidence-984551",
+     "evidence-1086048",
+     "evidence-868905"
+    ],
+    "path": "fallback",
+    "combined": [
+     1.9530608733534365,
+     1.8794116494324644,
+     1.8430278642788207,
+     1.8430278642788207,
+     1.804687654122846,
+     1.7482857802136644
+    ]
+   }
+  },
+  {
+   "text": "Cows produce large amounts of methane.",
+   "tags": "amount cow larg methan produc",
+   "submission": {
+    "ids": [
+     "evidence-394121"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.7369258582213436
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-394121"
+    ],
+    "path": "filtered",
+    "combined": [
+     2.473851716442687
+    ]
+   }
+  },
+  {
+   "text": "Kilimanjaro's snow is disappearing because of global warming.",
+   "tags": "disappear global kilimanjaro snow warm",
+   "submission": {
+    "ids": [
+     "evidence-680034"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.6
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-680034"
+    ],
+    "path": "filtered",
+    "combined": [
+     2.6
+    ]
+   }
+  },
+  {
+   "text": "Pacific island nations are threatened by rising seas.",
+   "tags": "island nation pacif rise sea threaten",
+   "submission": {
+    "ids": [
+     "evidence-902330"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.5341159244181828
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-902330"
+    ],
+    "path": "filtered",
+    "combined": [
+     2.2682318488363657
+    ]
+   }
+  },
+  {
+   "text": "Global temperatures have risen by about one degree since pre-industrial times.",
+   "tags": "degre global industri one pre risen sinc temperatur time",
+   "submission": {
+    "ids": [
+     "evidence-210115",
+     "evidence-1198385",
+     "evidence-1010540",
+     "evidence-988909",
+     "evidence-781448",
+     "evidence-1172406"
+    ],
+    "path": "fallback",
+    "combined": [
+     1.3488322601107754,
+     1.3488322601107754,
+     1.3053322375152767,
+     1.2247308663042886,
+     1.1465839510918112,
+     1.1194503707220667
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-988909",
+     "evidence-1088556",
+     "evidence-210115",
+     "evidence-1198385",
+     "evidence-781448",
+     "evidence-694262"
+    ],
+    "path": "fallback",
+    "combined": [
+     1.9494617326085772,
+     1.735176018322863,
+     1.6976645202215508,
+     1.6976645202215508,
+     1.6265012355169557,
+     1.6195164549250953
+    ]
+   }
+  },
+  {
+   "text": "Urban heat islands explain the warming trend in thermometer records.",
+   "tags": "explain heat island record thermomet trend urban warm",
+   "submission": {
+    "ids": [
+     "evidence-1097740"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.2550706936935396
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-1097740"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.8434747207204127
+    ]
+   }
+  },
+  {
+   "text": "Coral bleaching events are becoming more frequent.",
+   "tags": "becom bleach coral event frequent",
+   "submission": {
+    "ids": [
+     "evidence-1089290",
+     "evidence-159217",
+     "evidence-435434",
+     "evidence-47505",
+     "evidence-31221",
+     "evidence-1107699"
+    ],
+    "path": "fallback",
+    "combined": [
+     1.2272280825465134,
+     1.201195656075891,
+     1.1863958886500716,
+     1.1736730343283748,
+     1.1341254216315548,
+     1.1204257474113009
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-159217",
+     "evidence-1089290",
+     "evidence-435434",
+     "evidence-31221",
+     "evidence-835931",
+     "evidence-480334"
+    ],
+    "path": "fallback",
+    "combined": [
+     2.002391312151782,
+     1.9544561650930268,
+     1.8727917773001432,
+     1.8682508432631098,
+     1.8330759594328838,
+     1.8164055119506344
+    ]
+   }
+  },
+  {
+   "text": "The Arctic is warming twice as fast as the rest of the world.",
+   "tags": "arctic fast rest twice warm world",
+   "submission": {
+    "ids": [
+     "evidence-1002378",
+     "evidence-883422",
+     "evidence-1207155",
+     "evidence-964620",
+     "evidence-425877",
+     "evidence-363730"
+    ],
+    "path": "fallback",
+    "combined": [
+     1.5,
+     1.5,
+     1.5,
+     1.5,
+     1.3932366330241042,
+     1.3333333333333333
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-1207155",
+     "evidence-883422",
+     "evidence-1002378",
+     "evidence-964620",
+     "evidence-807162",
+     "evidence-413609"
+    ],
+    "path": "fallback",
+    "combined": [
+     2.5,
+     2.5,
+     2.5,
+     2.5,
+     2.333333333333333,
+     2.333333333333333
+    ]
+   }
+  },
+  {
+   "text": "Natural cycles explain the current warming.",
+   "tags": "current cycl explain natur warm",
+   "submission": {
+    "ids": [
+     "evidence-371750",
+     "evidence-1141853",
+     "evidence-802139",
+     "evidence-910137",
+     "evidence-1020795",
+     "evidence-938576"
+    ],
+    "path": "fallback",
+    "combined": [
+     1.2438461402264012,
+     1.1995423373419407,
+     1.1799719970477955,
+     1.1799719970477955,
+     1.1683508956156827,
+     1.1683508956156827
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-1141853",
+     "evidence-371750",
+     "evidence-802139",
+     "evidence-910137",
+     "evidence-938576",
+     "evidence-553377"
+    ],
+    "path": "fallback",
+    "combined": [
+     1.9990846746838815,
+     1.9876922804528023,
+     1.859943994095591,
+     1.859943994095591,
+     1.8367017912313655,
+     1.8367017912313655
+    ]
+   }
+  },
+  {
+   "text": "Fossil fuels supply most of the world's energy.",
+   "tags": "energi fossil fuel suppli world",
+   "submission": {
+    "ids": [
+     "evidence-400255",
+     "evidence-1154993"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.484841918063017,
+     1.4559591037402817
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-400255",
+     "evidence-1154993"
+    ],
+    "path": "filtered",
+    "combined": [
+     2.169683836126034,
+     2.1119182074805636
+    ]
+   }
+  },
+  {
+   "text": "Hydropower is a renewable energy source.",
+   "tags": "energi hydropow renew sourc",
+   "submission": {
+    "ids": [
+     "evidence-307600"
+    ],
+    "path": "filtered",
+    "combined": [
+     1.5716204534513891
+    ]
+   },
+   "notebook": {
+    "ids": [
+     "evidence-307600"
+    ],
+    "path": "filtered",
+    "combined": [
+     2.1432409069027782
+    ]
+   }
+  }
+ ]
+}

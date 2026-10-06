@@ -23,10 +23,14 @@ Outputs (all committed, all small):
 
 The database holds a PRUNED evidence index, never the full course corpus:
   * the gold evidence of every train and dev claim,
-  * every passage the rule could select for a dev/test claim (the per-claim pools
-    from build_retrieval.py - all filter passes + the top fallback scores), and
+  * every passage the rule could select for any train, dev or test claim (the
+    per-claim pools from build_retrieval.py - all filter passes + the top fallback
+    scores),
+  * every passage it could select for the Try-it examples (free_text_claims.py), and
   * a seeded random sample of the corpus as realistic distractors.
 Each passage keeps the team's keyword tags and its exact row of ``evidence_tfidf``.
+Claim TEXT is stored for the 154 dev claims only (the Explore pages show them);
+train and test claims keep their id, label and derived tags.
 
 Usage:  uv run scripts/build_web_data.py
 """
@@ -47,7 +51,8 @@ from nltk.corpus import stopwords
 from sklearn.metrics.pairwise import cosine_similarity
 
 import original as O
-from build_retrieval import CONFIGS, claim_tags_of, combine, prf
+from build_retrieval import CONFIGS, FastRetriever, claim_tags_of, combine, prf
+from free_text_claims import EXAMPLES, HELDOUT
 
 WEB = O.ROOT / "web"
 DB_PATH = WEB / "data" / "climate.db"
@@ -84,11 +89,13 @@ CREATE TABLE claims (
   claim_id TEXT PRIMARY KEY,
   split TEXT NOT NULL CHECK (split IN ('train', 'dev', 'test')),
   ord INTEGER NOT NULL,
-  claim_text TEXT NOT NULL,
+  claim_text TEXT CHECK ((split = 'dev') = (claim_text IS NOT NULL)),
   label TEXT CHECK (label IN ('SUPPORTS', 'REFUTES', 'NOT_ENOUGH_INFO', 'DISPUTED')),
-  tags TEXT NOT NULL
+  tags TEXT NOT NULL,
+  index_exact INTEGER NOT NULL CHECK (index_exact IN (0, 1))
 );
 CREATE INDEX claims_split ON claims (split, ord);
+CREATE INDEX claims_tags ON claims (tags);
 CREATE TABLE claim_evidence (
   claim_id TEXT NOT NULL REFERENCES claims (claim_id),
   rank INTEGER NOT NULL,
@@ -118,8 +125,8 @@ CREATE TABLE retrieval (
 CREATE TABLE retrieval_summary (
   claim_id TEXT NOT NULL REFERENCES claims (claim_id),
   run TEXT NOT NULL,
-  path TEXT NOT NULL CHECK (path IN ('filtered', 'fallback')),
-  n_filtered INTEGER NOT NULL,
+  path TEXT CHECK (path IN ('filtered', 'fallback')),  -- NULL for saved_2024: not in the 2024 file
+  n_filtered INTEGER,
   n_retrieved INTEGER NOT NULL,
   n_correct INTEGER,
   precision REAL,
@@ -178,7 +185,25 @@ CREATE TABLE passage_lengths (
 );
 """
 
-ORIGIN_GOLD, ORIGIN_POOL, ORIGIN_SAMPLE = 1, 2, 4
+ORIGIN_GOLD, ORIGIN_POOL, ORIGIN_SAMPLE, ORIGIN_EXAMPLE = 1, 2, 4, 8
+
+
+def equal_up_to_ties(a: dict, b: dict) -> bool:
+    """Same path, same scores, and the same passages except inside the tie group at the cut-off.
+
+    Mirrors ``equalUpToTies`` in web/src/lib/retrieval.test.ts.
+    """
+    ca = [s["combined"] for s in a["scores"]]
+    cb = [s["combined"] for s in b["scores"]]
+    if a["path"] != b["path"] or len(ca) != len(cb):
+        return False
+    if any(abs(x - y) > 1e-9 for x, y in zip(ca, cb)):
+        return False
+    if not ca:
+        return True
+    cut = min(ca)
+    above = lambda r, c: sorted(i for i, x in zip(r["ids"], c) if x - cut > 1e-9)
+    return above(a, ca) == above(b, cb)
 
 
 def pack_vec(row) -> bytes:
@@ -256,19 +281,20 @@ def main():
     # ---- pruned evidence index -----------------------------------------------------------
     origin: Counter = Counter()
     gold_ids = {e for s in ("train", "dev") for c in claims[s].values() for e in c["evidences"]}
-    pool_ids = set()
+    pool_ids = set(retrieval["train_pool"])
     for split in ("dev", "test"):
         for row in retrieval[split].values():
             pool_ids |= set(row["pool"]) | set(row["saved_2024"])
             for run in ("submission", "notebook", "notebook_raw_claim"):
                 if run in row:
                     pool_ids |= set(row[run]["ids"])
+    example_ids = set(retrieval["example_pool"])
     rng = random.Random(SEED)
     sample_ids = set(df["evidence_id"].iloc[sorted(rng.sample(range(len(df)), SAMPLE_N))])
-    all_ids = gold_ids | pool_ids | sample_ids
+    all_ids = gold_ids | pool_ids | example_ids | sample_ids
     for e in all_ids:
         origin[e] = (ORIGIN_GOLD if e in gold_ids else 0) | (ORIGIN_POOL if e in pool_ids else 0) | \
-                    (ORIGIN_SAMPLE if e in sample_ids else 0)
+                    (ORIGIN_SAMPLE if e in sample_ids else 0) | (ORIGIN_EXAMPLE if e in example_ids else 0)
     # ord = row position in the team's processed_evidence.csv (the order pandas scanned, which decides
     # ties); passages the team could not tag (and so never retrieved) go after them.
     corpus_order = {eid: i for i, eid in enumerate(evidence)}  # position in evidence.json
@@ -281,7 +307,58 @@ def main():
         ev_rows.append((eid, ord_of[eid], evidence[eid], tags, vec, origin[eid]))
     n_indexed = sum(r[3] is not None for r in ev_rows)
     print(f"pruned index: {len(ev_rows):,} passages ({n_indexed:,} retrievable); gold {len(gold_ids):,}, "
-          f"pool {len(pool_ids):,}, sample {len(sample_ids):,}", flush=True)
+          f"pool {len(pool_ids):,}, examples {len(example_ids):,}, sample {len(sample_ids):,}", flush=True)
+
+    # ---- the rule over the pruned index vs the full corpus ----------------------------------
+    sub_pos = sorted(pos_of[r[0]] for r in ev_rows if r[3] is not None)
+    pruned = FastRetriever(df.iloc[sub_pos], evidence_tfidf[sub_pos], tag_vec)
+
+    def run_pruned(tags: str, cfg: dict) -> dict:
+        sim, ov, cnt = pruned.features(tags)
+        path, n_filtered, rows = pruned.select(sim, ov, cnt, **cfg)
+        return {"ids": rows["evidence_id"].tolist(), "path": path,
+                "scores": [{"combined": float(c)} for c in rows["combined_score"]]}
+
+    # every claim whose full-corpus selection the pruned index reproduces (up to exact ties):
+    # dev/test are re-checked by vitest; train is checked here (its pools are in the index)
+    index_exact = {}
+    for split in ("dev", "test"):
+        for cid, row in retrieval[split].items():
+            index_exact[cid] = all(equal_up_to_ties(run_pruned(row["tags"], cfg), row[name])
+                                   for name, cfg in CONFIGS.items())
+    for cid in claims["train"]:
+        row = retrieval["train"].get(cid)  # absent for a claim with no tags
+        index_exact[cid] = row is not None and all(
+            equal_up_to_ties(run_pruned(row["tags"], cfg), row[name]) for name, cfg in CONFIGS.items())
+    n_exact = Counter(s for s, cs in claims.items() for cid in cs if index_exact[cid])
+    print(f"pruned index reproduces the full-corpus selection for {dict(n_exact)} claims", flush=True)
+    assert n_exact["dev"] == len(claims["dev"]) and n_exact["test"] == len(claims["test"]), n_exact
+
+    # Try-it examples: the note must describe the full-corpus run, and the pruned index must agree
+    gold_of = {}
+    for s_ in ("train", "dev"):
+        for cid, c in claims[s_].items():
+            for e in c["evidences"]:
+                gold_of.setdefault(e, []).append(cid)
+    try_examples = []
+    for ex in retrieval["free_text"]["examples"]:
+        full = ex["submission"]
+        facts = {"gold" if any(e in gold_of for e in full["ids"]) else "no_gold", full["path"]}
+        assert set(ex["expect"]) <= facts, (ex["text"], ex["expect"], facts)
+        for name, cfg in CONFIGS.items():
+            assert equal_up_to_ties(run_pruned(ex["tags"], cfg), ex[name]), (ex["text"], name)
+        try_examples.append({"text": ex["text"], "note": ex["note"], "tags": ex["tags"]})
+
+    # held-out free text: how often does the pruned index agree with the full corpus?
+    free_text_parity = {"claims": len(retrieval["free_text"]["heldout"])}
+    for name, cfg in CONFIGS.items():
+        by_path = {"filtered": [0, 0], "fallback": [0, 0]}
+        for h in retrieval["free_text"]["heldout"]:
+            ok = equal_up_to_ties(run_pruned(h["tags"], cfg), h[name])
+            by_path[h[name]["path"]][0] += ok
+            by_path[h[name]["path"]][1] += 1
+        free_text_parity[name] = {"agree": sum(v[0] for v in by_path.values()), "by_path": by_path}
+    print("free-text agreement", json.dumps(free_text_parity), flush=True)
 
     # recomputing the tag TF-IDF of a passage from its tags must give its stored row
     check = rng.sample([r for r in ev_rows if r[3] is not None], 500)
@@ -307,7 +384,8 @@ def main():
                 runs["notebook_raw"] = "notebook_raw_claim"
             for run, key in runs.items():
                 if key is None:  # the team's saved list, scored with the submission rule
-                    ids, path, n_filtered = row["saved_2024"], row["submission"]["path"], row["submission"]["n_filtered"]
+                    # the 2024 file records only ids, so its selection path is unknown (NULL)
+                    ids, path, n_filtered = row["saved_2024"], None, None
                     scores = [pair_scores(row["tags"], e, 1) for e in ids]
                 else:
                     r = row[key]
@@ -387,8 +465,11 @@ def main():
         "keyword_vectorizer": {"max_df": 0.5, "min_df": 5, "max_features": 20000, "ngram_range": [1, 3], "top_n": 10},
         "index": {
             "passages": len(ev_rows), "retrievable": n_indexed, "gold": len(gold_ids), "pool": len(pool_ids),
-            "sample": len(sample_ids), "sample_seed": SEED, "corpus_rows": int(len(df)), "corpus_total": len(evidence),
+            "examples": len(example_ids), "sample": len(sample_ids), "sample_seed": SEED,
+            "corpus_rows": int(len(df)), "corpus_total": len(evidence),
         },
+        "try_examples": try_examples,
+        "free_text_parity": free_text_parity,
         "passage_lengths_match_report": lengths_match,
         # numpy's argsort pads short passages' top-10 with zero-weight features; the last
         # vocabulary entry is alphabetic, so it leaks into many tags (see web/src/lib/numpy.ts)
@@ -404,8 +485,10 @@ def main():
     con.executescript(SCHEMA)
     con.executemany("INSERT INTO meta VALUES (?, ?)", [(k, json.dumps(v)) for k, v in meta.items()])
     for split, cs in claims.items():
-        con.executemany("INSERT INTO claims VALUES (?, ?, ?, ?, ?, ?)",
-                        [(cid, split, i, c["claim_text"], c.get("claim_label"), claim_tags_of(c["claim_text"]))
+        # claim text only for dev (shown on /explore); train/test keep id, label and derived tags
+        con.executemany("INSERT INTO claims VALUES (?, ?, ?, ?, ?, ?, ?)",
+                        [(cid, split, i, c["claim_text"] if split == "dev" else None, c.get("claim_label"),
+                          claim_tags_of(c["claim_text"]), int(index_exact[cid]))
                          for i, (cid, c) in enumerate(cs.items())])
         if split != "test":
             con.executemany("INSERT INTO claim_evidence VALUES (?, ?, ?)",
@@ -467,10 +550,11 @@ def main():
         "climate climates climatic climatology warming warmed warmer generalizations oscillators",
     ]
     rng = random.Random(7)
+    # dev claims (already public on the site), the hand-written free-text claims and indexed passages;
+    # train/test claim texts are not redistributed
     texts = (edge_cases + [c["claim_text"] for c in claims["dev"].values()]
-             + [c["claim_text"] for c in claims["test"].values()]
-             + rng.sample([c["claim_text"] for c in claims["train"].values()], 150)
-             + [r[2] for r in rng.sample(ev_rows, 300)])
+             + [ex["text"] for ex in EXAMPLES] + HELDOUT
+             + [r[2] for r in rng.sample(ev_rows, 600)])
     (FIXTURES / "preprocess.json").write_text(json.dumps(
         [{"text": t, "stems": O.preprocess_and_tokenize(t)} for t in texts], ensure_ascii=False))
     vocab_words = set()
@@ -495,6 +579,13 @@ def main():
     (FIXTURES / "argsort.json").write_text(json.dumps([
         {"n": len(c), "nonzero": [[int(i), float(c[i])] for i in np.flatnonzero(c)],
          "tail": np.argsort(c)[-40:].tolist()} for c in cases]))
+    # full-corpus selections of the Try-it examples and the held-out free-text claims
+    keep = lambda r: {"ids": r["ids"], "path": r["path"], "combined": [x["combined"] for x in r["scores"]]}
+    (FIXTURES / "free-text.json").write_text(json.dumps({
+        group: [{"text": r["text"], "tags": r["tags"], **{name: keep(r[name]) for name in CONFIGS}}
+                for r in retrieval["free_text"][group]]
+        for group in ("examples", "heldout")
+    }, ensure_ascii=False, indent=1))
     print(f"fixtures: {len(texts)} texts, {len(vocab_words)} stem pairs; done in {time.time() - t0:.0f}s")
 
 

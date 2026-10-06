@@ -41,16 +41,21 @@ function toClaimRow(r: ClaimDbRow): ClaimRow {
   };
 }
 
-/** The 154 dev claims with their 2024 retrieval score and the retrained model's prediction. */
+/**
+ * The 154 dev claims with their 2024 retrieval score and the retrained model's prediction.
+ * The saved 2024 file does not record the selection path, so `path` comes from the re-run of
+ * the submission rule (identical scores for 152 of the 154 dev claims).
+ */
 export function listDevClaims(): ClaimSummary[] {
   const rows = getDb()
     .prepare(
       `SELECT c.claim_id, c.ord, c.claim_text, c.label, p.label AS predicted,
-              s.f, s.n_correct, s.n_retrieved, s.path,
+              s.f, s.n_correct, s.n_retrieved, r.path,
               (SELECT COUNT(*) FROM claim_evidence g WHERE g.claim_id = c.claim_id) AS n_gold
          FROM claims c
          JOIN predictions p ON p.claim_id = c.claim_id AND p.protocol = 'batch'
          JOIN retrieval_summary s ON s.claim_id = c.claim_id AND s.run = 'saved_2024'
+         JOIN retrieval_summary r ON r.claim_id = c.claim_id AND r.run = 'submission'
         WHERE c.split = 'dev'
         ORDER BY c.ord`,
     )
@@ -88,10 +93,25 @@ export function listClaimIds(split: Split): string[] {
   ).map((r) => r.claim_id);
 }
 
-export function getClaim(id: string): ClaimRow | null {
-  const row = getDb().prepare("SELECT * FROM claims WHERE claim_id = ?").get(id) as
-    ClaimDbRow | undefined;
+/** A dev claim (only dev claims carry their text; train and test keep id, label and tags). */
+export function getDevClaim(id: string): ClaimRow | null {
+  const row = getDb()
+    .prepare("SELECT * FROM claims WHERE claim_id = ? AND split = 'dev'")
+    .get(id) as ClaimDbRow | undefined;
   return row ? toClaimRow(row) : null;
+}
+
+/**
+ * Whether the pruned index is known to reproduce the full-corpus selection for these claim
+ * tags: they belong to a dataset claim the build checked (every dev and test claim, which
+ * vitest re-checks, and the train claims that passed the same check).
+ */
+export function isIndexExact(claimTags: string): boolean {
+  return (
+    getDb()
+      .prepare("SELECT 1 FROM claims WHERE tags = ? AND index_exact = 1 LIMIT 1")
+      .get(claimTags) !== undefined
+  );
 }
 
 /** Passages by id, in the order requested (unknown ids are skipped). */
@@ -128,8 +148,8 @@ export function goldClaimsFor(ids: readonly string[]): Map<string, { id: string;
 
 export function getClaimDetail(id: string): ClaimDetail | null {
   const db = getDb();
-  const claim = getClaim(id);
-  if (!claim || claim.split !== "dev") return null;
+  const claim = getDevClaim(id);
+  if (!claim) return null;
 
   const goldIds = (
     db
@@ -142,8 +162,8 @@ export function getClaimDetail(id: string): ClaimDetail | null {
 
   const summaries = db.prepare("SELECT * FROM retrieval_summary WHERE claim_id = ?").all(id) as {
     run: RunId;
-    path: "filtered" | "fallback";
-    n_filtered: number;
+    path: "filtered" | "fallback" | null;
+    n_filtered: number | null;
     n_retrieved: number;
     n_correct: number | null;
     precision: number | null;
