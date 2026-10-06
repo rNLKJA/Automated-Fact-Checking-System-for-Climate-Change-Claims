@@ -40,7 +40,3 @@ export function preprocessTrace(text: string): PreprocessTrace {
 export function preprocessAndTokenize(text: string): string[] {
   return preprocessTrace(text).stems;
 }
-
-export function isStopword(word: string): boolean {
-  return STOPWORDS.has(word);
-}

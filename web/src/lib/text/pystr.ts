@@ -20,9 +20,7 @@ export function pyIsAlpha(s: string): boolean {
   return ALPHA_RE.test(s);
 }
 
-/** Python `string.punctuation`. */
-export const PY_PUNCTUATION = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
-
+/** Python `string.punctuation` as a character class. */
 const PUNCT_RE = /[!"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]/g;
 
 /**
