@@ -10,7 +10,7 @@
 ![Python](https://img.shields.io/badge/Python-uv_scripts-3776AB?logo=python&logoColor=white)
 [![University of Melbourne](https://img.shields.io/badge/University_of_Melbourne-COMP90042-002250)](https://handbook.unimelb.edu.au/subjects/comp90042)
 
-**Live demo:** _coming soon (Vercel deployment pending)_
+**Live demo:** [comp90042-climate-fact-check.vercel.app](https://comp90042-climate-fact-check.vercel.app)
 
 </div>
 
@@ -168,6 +168,16 @@ The database contains:
 - **Predictions** under three protocols, training histories (the 2024 log parsed from the notebook
   and the 2026 retrain), both vectorizers' vocabularies and IDF weights, and the Transformer's
   token table.
+
+The app only reads this file, so there is no admin area or remote database: to browse the
+records, open `web/data/climate.db` in any SQLite browser (for example
+[DB Browser for SQLite](https://sqlitebrowser.org)) or query it directly:
+
+```bash
+sqlite3 web/data/climate.db ".tables"
+sqlite3 web/data/climate.db "SELECT claim_id, label, claim_text FROM claims WHERE split = 'dev' LIMIT 5"
+sqlite3 web/data/climate.db "SELECT key, value FROM meta WHERE key = 'free_text_parity'"
+```
 
 `web/src/lib/__fixtures__/` holds Python ground truth for the parity tests (preprocessing,
 Porter stems, numpy argsort, and the full-corpus selections for the free-text claims).
