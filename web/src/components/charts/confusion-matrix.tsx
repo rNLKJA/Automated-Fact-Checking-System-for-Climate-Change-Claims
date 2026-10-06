@@ -8,6 +8,14 @@ import { SegmentedControl } from "./chart-frame";
 
 type Matrix = { matrix: number[][]; accuracy: number; total: number };
 
+/** Compact column/row labels for narrow screens (the full label stays available to screen readers). */
+const ABBR: Record<(typeof LABELS)[number], string> = {
+  SUPPORTS: "S",
+  REFUTES: "R",
+  NOT_ENOUGH_INFO: "NEI",
+  DISPUTED: "D",
+};
+
 const STEPS = [
   "var(--seq-100)",
   "var(--seq-200)",
@@ -38,19 +46,27 @@ export function ConfusionMatrix({ data }: { data: Record<Protocol, Matrix> }) {
         <span className="font-mono text-foreground tabular">{(m.accuracy * 100).toFixed(1)}%</span>{" "}
         on {m.total} dev claims. {PROTOCOLS[protocol].description}
       </p>
-      <div className="overflow-x-auto">
-        <table className="w-full min-w-[30rem] table-fixed border-separate border-spacing-[3px] text-sm">
+      <div
+        className="overflow-x-auto"
+        role="region"
+        aria-label="Confusion matrix table"
+        tabIndex={0}
+      >
+        <table className="w-full table-fixed border-separate border-spacing-[3px] text-sm">
           <caption className="sr-only">
             Confusion matrix: rows are gold labels, columns are predicted labels
           </caption>
           <thead>
             <tr>
-              <th scope="col" className="w-32 text-left text-xs font-normal text-muted-foreground">
-                gold ↓ / predicted →
+              <th
+                scope="col"
+                className="w-16 text-left text-[0.7rem] leading-tight font-normal text-muted-foreground sm:w-32 sm:text-xs"
+              >
+                gold ↓ <span className="whitespace-nowrap">/ predicted →</span>
               </th>
               {LABELS.map((l) => (
                 <th key={l} scope="col" className="px-1 pb-1 text-center text-xs font-medium">
-                  {LABEL_TEXT[l].short}
+                  <LabelText label={l} />
                 </th>
               ))}
             </tr>
@@ -59,7 +75,7 @@ export function ConfusionMatrix({ data }: { data: Record<Protocol, Matrix> }) {
             {LABELS.map((gold, i) => (
               <tr key={gold}>
                 <th scope="row" className="pr-2 text-left text-xs font-medium whitespace-nowrap">
-                  {LABEL_TEXT[gold].short}
+                  <LabelText label={gold} />
                 </th>
                 {LABELS.map((pred, j) => {
                   const v = m.matrix[i][j];
@@ -90,7 +106,22 @@ export function ConfusionMatrix({ data }: { data: Record<Protocol, Matrix> }) {
       </div>
       <p className="text-xs text-muted-foreground">
         Outlined cells are correct predictions. Stronger blue means more claims.
+        <span className="sm:hidden">
+          {" "}
+          S = supports, R = refutes, NEI = not enough info, D = disputed.
+        </span>
       </p>
     </div>
+  );
+}
+
+function LabelText({ label }: { label: (typeof LABELS)[number] }) {
+  return (
+    <>
+      <span className="sm:hidden" aria-hidden>
+        {ABBR[label]}
+      </span>
+      <span className="sr-only sm:not-sr-only">{LABEL_TEXT[label].short}</span>
+    </>
   );
 }

@@ -113,7 +113,7 @@ export function ThresholdSweep({ sweeps }: { sweeps: Sweeps }) {
         aria-label={`Precision, recall and F-score against the ${meta.label.toLowerCase()}`}
       >
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={data} margin={{ top: 8, right: 16, bottom: 4, left: 0 }}>
+          <LineChart data={data} margin={{ top: 22, right: 16, bottom: 4, left: 0 }}>
             <CartesianGrid stroke="var(--grid)" vertical={false} />
             <XAxis
               dataKey="value"

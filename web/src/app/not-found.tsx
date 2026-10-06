@@ -1,7 +1,13 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 
 import { Stripes } from "@/components/common/stripes";
 import { Button } from "@/components/ui/button";
+
+export const metadata: Metadata = {
+  title: "Not found",
+  robots: { index: false },
+};
 
 export default function NotFound() {
   return (

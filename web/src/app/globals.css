@@ -109,7 +109,8 @@
   --seq-ink-100: #13212c;
   --seq-ink-200: #13212c;
   --seq-ink-300: #13212c;
-  --seq-ink-400: #ffffff;
+  /* dark ink on the mid blue: white only reaches 3.6:1 there */
+  --seq-ink-400: #07131c;
   --seq-ink-500: #ffffff;
   --seq-ink-600: #ffffff;
   --seq-ink-700: #ffffff;
@@ -170,7 +171,8 @@
   --seq-200: #133556;
   --seq-300: #184f95;
   --seq-400: #1c5cab;
-  --seq-500: #2a78d6;
+  /* a touch darker than --verdict-supports so white numbers reach 4.8:1 */
+  --seq-500: #2672cc;
   --seq-600: #5598e7;
   --seq-700: #9ec5f4;
   --seq-ink-100: #e4ecf1;
