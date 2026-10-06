@@ -54,41 +54,48 @@ export function TryIt({
   const resultRef = useRef<HTMLDivElement>(null);
   const ran = useRef(false);
 
-  const run = useCallback((text: string, which: RuleId, reveal = false) => {
-    startTransition(async () => {
-      try {
-        const res = await fetch("/api/check", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ claim: text, rule: which }),
-        });
-        const json = (await res.json()) as CheckResponse | { error: string };
-        if (!res.ok || "error" in json) {
-          setState({
-            status: "error",
-            message: "error" in json ? json.error : `Request failed (${res.status}).`,
-          });
-        } else {
-          setState({ status: "done", result: json });
-          requestAnimationFrame(() => {
-            const el = resultRef.current;
-            if (!el) return;
-            el.focus({ preventScroll: true });
-            // on one-column layouts the result sits below the form and examples
-            if (reveal && window.matchMedia("(max-width: 1023px)").matches) {
-              const smooth = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-              el.scrollIntoView({ behavior: smooth ? "smooth" : "auto", block: "start" });
-            }
-          });
-        }
-      } catch {
-        setState({
-          status: "error",
-          message: "Could not reach the server. Check your connection and try again.",
-        });
+  /** Focus a fresh verdict; on one-column layouts it sits below the examples, so scroll to it. */
+  const reveal = useCallback(() => {
+    requestAnimationFrame(() => {
+      const el = resultRef.current;
+      if (!el) return;
+      el.focus({ preventScroll: true });
+      if (window.matchMedia("(max-width: 1023px)").matches) {
+        const smooth = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        el.scrollIntoView({ behavior: smooth ? "smooth" : "auto", block: "start" });
       }
     });
   }, []);
+
+  const run = useCallback(
+    (text: string, which: RuleId) => {
+      startTransition(async () => {
+        try {
+          const res = await fetch("/api/check", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ claim: text, rule: which }),
+          });
+          const json = (await res.json()) as CheckResponse | { error: string };
+          if (!res.ok || "error" in json) {
+            setState({
+              status: "error",
+              message: "error" in json ? json.error : `Request failed (${res.status}).`,
+            });
+          } else {
+            setState({ status: "done", result: json });
+            reveal();
+          }
+        } catch {
+          setState({
+            status: "error",
+            message: "Could not reach the server. Check your connection and try again.",
+          });
+        }
+      });
+    },
+    [reveal],
+  );
 
   useEffect(() => {
     if (initialClaim && !ran.current) {
@@ -102,7 +109,7 @@ export function TryIt({
       setState({ status: "error", message: "Type a claim of at least a few words." });
       return;
     }
-    run(text, which, true);
+    run(text, which);
   };
 
   return (
@@ -184,6 +191,11 @@ export function TryIt({
           )}
         </Button>
 
+        {/* one-column layouts: show errors next to the input, not below the examples */}
+        {!pending && state.status === "error" && (
+          <ErrorAlert message={state.message} className="lg:hidden" />
+        )}
+
         <div className="space-y-2">
           <p className="text-sm font-medium">Or start from an example</p>
           <ul className="space-y-1.5">
@@ -217,16 +229,7 @@ export function TryIt({
         {pending ? (
           <ResultSkeleton />
         ) : state.status === "error" ? (
-          <div
-            role="alert"
-            className="flex gap-3 rounded-xl border border-destructive/40 bg-destructive/8 p-5"
-          >
-            <TriangleAlert aria-hidden className="mt-0.5 size-5 shrink-0 text-destructive" />
-            <div>
-              <p className="font-medium">That didn&rsquo;t work</p>
-              <p className="mt-1 text-sm text-muted-foreground">{state.message}</p>
-            </div>
-          </div>
+          <ErrorAlert message={state.message} className="hidden lg:flex" />
         ) : state.status === "done" ? (
           <Result
             r={state.result}
@@ -237,6 +240,25 @@ export function TryIt({
         ) : (
           <EmptyState indexSize={indexSize} />
         )}
+      </div>
+    </div>
+  );
+}
+
+/** Rendered in one of two places by breakpoint; the hidden copy is display:none, so only one is announced. */
+function ErrorAlert({ message, className }: { message: string; className?: string }) {
+  return (
+    <div
+      role="alert"
+      className={cn(
+        "flex gap-3 rounded-xl border border-destructive/40 bg-destructive/8 p-5",
+        className,
+      )}
+    >
+      <TriangleAlert aria-hidden className="mt-0.5 size-5 shrink-0 text-destructive" />
+      <div>
+        <p className="font-medium">That didn&rsquo;t work</p>
+        <p className="mt-1 text-sm text-muted-foreground">{message}</p>
       </div>
     </div>
   );
