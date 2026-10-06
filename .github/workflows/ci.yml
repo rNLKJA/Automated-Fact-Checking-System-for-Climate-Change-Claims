@@ -1,8 +1,13 @@
 name: CI
 
+# Every push (any branch) runs once; pull requests from this repo show those checks, so a
+# separate pull_request trigger would only run the same job twice.
 on:
   push:
-  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 concurrency:
   group: ci-${{ github.ref }}
