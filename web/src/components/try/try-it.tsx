@@ -4,6 +4,7 @@ import { ArrowRight, Info, LoaderCircle, ShieldCheck, TriangleAlert } from "luci
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 
+import { SecondOpinion } from "@/components/ai/second-opinion";
 import { ProbabilityBars, VerdictBadge } from "@/components/common/verdict";
 import { EvidenceCard } from "@/components/evidence/evidence-card";
 import { TagChips } from "@/components/evidence/tag-chips";
@@ -339,6 +340,19 @@ function Result({
           {LABEL_TEXT.REFUTES.short.toLowerCase()} or {LABEL_TEXT.DISPUTED.short.toLowerCase()}.
         </p>
       </section>
+
+      <SecondOpinion
+        key={`${r.rule}:${r.claim}:${r.retrieval.passages.map((p) => p.id).join(",")}`}
+        claim={r.claim}
+        modelLabel={c.label}
+        options={[
+          {
+            key: "retrieved",
+            label: "Retrieved",
+            passages: r.retrieval.passages.map((p) => ({ id: p.id, text: p.text })),
+          },
+        ]}
+      />
 
       <section aria-labelledby="evidence-h" className="space-y-4">
         <div className="flex flex-wrap items-baseline justify-between gap-2">

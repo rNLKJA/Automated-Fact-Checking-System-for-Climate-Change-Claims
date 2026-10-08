@@ -28,5 +28,7 @@ export const NAV = [
   { href: "/try", label: "Try a claim" },
   { href: "/explore", label: "Explore" },
   { href: "/results", label: "Results" },
-  { href: "/method", label: "Method" },
+  { href: "/evaluation", label: "LLM eval" },
+  { href: "/method", label: "Pipeline" },
+  { href: "/methods", label: "Methods" },
 ] as const;

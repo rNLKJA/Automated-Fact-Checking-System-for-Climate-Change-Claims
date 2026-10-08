@@ -1,0 +1,1799 @@
+{
+ "generated_by": "scripts/stats_reference.py",
+ "level": 0.95,
+ "units": {
+  "mulberry32": {
+   "0": [
+    0.26642920868471265,
+    0.0003297457005828619,
+    0.2232720274478197,
+    0.1462021479383111,
+    0.46732782293111086,
+    0.5450490827206522,
+    0.6152513844426721,
+    0.6489853798411787
+   ],
+   "42": [
+    0.6011037519201636,
+    0.44829055899754167,
+    0.8524657934904099,
+    0.6697340414393693,
+    0.17481389874592423,
+    0.5265925421845168,
+    0.2732279943302274,
+    0.6247446539346129
+   ],
+   "2026": [
+    0.45540769933722913,
+    0.30849614599719644,
+    0.6611574492417276,
+    0.6184752183035016,
+    0.15228010178543627,
+    0.22184331016615033,
+    0.682859911583364,
+    0.8014086990151554
+   ],
+   "-1": [
+    0.8964226141106337,
+    0.189478256739676,
+    0.7156526781618595,
+    0.9440599093213677,
+    0.8452364315744489,
+    0.5391399988438934,
+    0.6804977387655526,
+    0.4755720964167267
+   ],
+   "4294967295": [
+    0.8964226141106337,
+    0.189478256739676,
+    0.7156526781618595,
+    0.9440599093213677,
+    0.8452364315744489,
+    0.5391399988438934,
+    0.6804977387655526,
+    0.4755720964167267
+   ]
+  },
+  "sample": {
+   "items": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33,
+    34,
+    35,
+    36,
+    37,
+    38,
+    39,
+    40,
+    41,
+    42,
+    43,
+    44,
+    45,
+    46,
+    47,
+    48,
+    49,
+    50,
+    51,
+    52,
+    53,
+    54,
+    55,
+    56,
+    57,
+    58,
+    59,
+    60,
+    61,
+    62,
+    63,
+    64,
+    65,
+    66,
+    67,
+    68,
+    69,
+    70,
+    71,
+    72,
+    73,
+    74,
+    75,
+    76,
+    77,
+    78,
+    79,
+    80,
+    81,
+    82,
+    83,
+    84,
+    85,
+    86,
+    87,
+    88,
+    89,
+    90,
+    91,
+    92,
+    93,
+    94,
+    95,
+    96,
+    97,
+    98,
+    99,
+    100,
+    101,
+    102,
+    103,
+    104,
+    105,
+    106,
+    107,
+    108,
+    109,
+    110,
+    111,
+    112,
+    113,
+    114,
+    115,
+    116,
+    117,
+    118,
+    119,
+    120,
+    121,
+    122,
+    123,
+    124,
+    125,
+    126,
+    127,
+    128,
+    129,
+    130,
+    131,
+    132,
+    133,
+    134,
+    135,
+    136,
+    137,
+    138,
+    139,
+    140,
+    141,
+    142,
+    143,
+    144,
+    145,
+    146,
+    147,
+    148,
+    149,
+    150,
+    151,
+    152,
+    153
+   ],
+   "k": 20,
+   "seed": 42,
+   "expected": [
+    92,
+    69,
+    131,
+    104,
+    30,
+    83,
+    46,
+    98,
+    134,
+    77,
+    45,
+    137,
+    117,
+    56,
+    41,
+    84,
+    110,
+    100,
+    18,
+    82
+   ]
+  },
+  "quantile": [
+   {
+    "x": [
+     0.034193,
+     1.359748,
+     1.224721,
+     -0.510307,
+     -0.29797,
+     -0.527384,
+     0.569726
+    ],
+    "p": [
+     0.0,
+     0.025000000000000022,
+     0.1,
+     0.5,
+     0.9,
+     0.975,
+     1.0
+    ],
+    "expected": [
+     -0.527384,
+     -0.5248224499999999,
+     -0.5171378,
+     0.034193,
+     1.2787318,
+     1.3394939499999998,
+     1.359748
+    ]
+   },
+   {
+    "x": [
+     0.129774,
+     0.948328,
+     0.621884,
+     0.368993,
+     0.51139,
+     0.662843,
+     0.275309,
+     0.137968,
+     0.78804,
+     0.670361,
+     0.512382,
+     0.816736,
+     0.549075,
+     0.980914,
+     0.204509,
+     0.55373,
+     0.483625,
+     0.353275,
+     0.591595,
+     0.235301,
+     0.802203,
+     0.867334,
+     0.12876,
+     0.467073,
+     0.277145,
+     0.083117,
+     0.895944,
+     0.429949,
+     0.147691,
+     0.673362,
+     0.202216,
+     0.901431,
+     0.217148,
+     0.033075,
+     0.200769,
+     0.345748,
+     0.468908,
+     0.906134,
+     0.697361,
+     0.339321,
+     0.016877,
+     0.159824,
+     0.996436,
+     0.459716,
+     0.69104,
+     0.054668,
+     0.03405,
+     0.84589,
+     0.587882,
+     0.30871
+    ],
+    "p": [
+     0.0,
+     0.025000000000000022,
+     0.1,
+     0.5,
+     0.9,
+     0.975,
+     1.0
+    ],
+    "expected": [
+     0.016877,
+     0.033294375,
+     0.12419570000000003,
+     0.4679905,
+     0.8964926999999999,
+     0.9735821499999999,
+     0.996436
+    ]
+   },
+   {
+    "x": [
+     1.0,
+     1.0,
+     2.0
+    ],
+    "p": [
+     0.0,
+     0.025000000000000022,
+     0.1,
+     0.5,
+     0.9,
+     0.975,
+     1.0
+    ],
+    "expected": [
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.8,
+     1.95,
+     2.0
+    ]
+   }
+  ],
+  "normal_ppf": [
+   [
+    1e-12,
+    -7.034483825301131
+   ],
+   [
+    1e-06,
+    -4.753424308822899
+   ],
+   [
+    0.001,
+    -3.090232306167813
+   ],
+   [
+    0.01,
+    -2.3263478740408408
+   ],
+   [
+    0.025,
+    -1.9599639845400545
+   ],
+   [
+    0.05,
+    -1.6448536269514729
+   ],
+   [
+    0.2,
+    -0.8416212335729142
+   ],
+   [
+    0.5,
+    0.0
+   ],
+   [
+    0.7,
+    0.5244005127080407
+   ],
+   [
+    0.975,
+    1.959963984540054
+   ],
+   [
+    0.999,
+    3.090232306167813
+   ],
+   [
+    0.999999999,
+    5.997807019601637
+   ]
+  ],
+  "normal_cdf": [
+   [
+    -6.0,
+    9.865876450376944e-10
+   ],
+   [
+    -3.0,
+    0.001349898031630093
+   ],
+   [
+    -1.959963984540054,
+    0.024999999999999998
+   ],
+   [
+    -0.5,
+    0.3085375387259869
+   ],
+   [
+    0.0,
+    0.5
+   ],
+   [
+    0.3,
+    0.6179114221889526
+   ],
+   [
+    1.0,
+    0.8413447460685429
+   ],
+   [
+    2.5,
+    0.9937903346742238
+   ],
+   [
+    5.0,
+    0.9999997133484281
+   ]
+  ],
+  "chi2_sf": [
+   [
+    0.1,
+    1,
+    0.7518296340458492
+   ],
+   [
+    1.0,
+    1,
+    0.31731050786291115
+   ],
+   [
+    3.841458820694124,
+    1,
+    0.04999999999999994
+   ],
+   [
+    10.0,
+    1,
+    0.0015654022580025482
+   ],
+   [
+    25.0,
+    1,
+    5.733031437583878e-07
+   ],
+   [
+    2.0,
+    3,
+    0.5724067044708798
+   ],
+   [
+    7.5,
+    4,
+    0.11170929281604328
+   ]
+  ],
+  "binom_cdf": [
+   [
+    0,
+    5,
+    0.5,
+    0.03125
+   ],
+   [
+    3,
+    10,
+    0.5,
+    0.171875
+   ],
+   [
+    7,
+    20,
+    0.5,
+    0.13158798217773438
+   ],
+   [
+    2,
+    9,
+    0.3,
+    0.4628311660000002
+   ],
+   [
+    40,
+    154,
+    0.5,
+    9.907902005875227e-10
+   ],
+   [
+    60,
+    61,
+    0.5,
+    1.0
+   ]
+  ],
+  "gammaln": [
+   [
+    0.1,
+    2.252712651734206
+   ],
+   [
+    0.5,
+    0.5723649429247
+   ],
+   [
+    1.0,
+    0.0
+   ],
+   [
+    2.5,
+    0.2846828704729192
+   ],
+   [
+    10.0,
+    12.801827480081469
+   ],
+   [
+    155.0,
+    625.1286567308911
+   ],
+   [
+    1000.5,
+    5908.674175848678
+   ]
+  ],
+  "wilson": [
+   {
+    "k": 0,
+    "n": 20,
+    "estimate": 0.0,
+    "lower": 0.0,
+    "upper": 0.16112515805281938,
+    "level": 0.95
+   },
+   {
+    "k": 1,
+    "n": 20,
+    "estimate": 0.05,
+    "lower": 0.008881448800795402,
+    "upper": 0.23613119344674205,
+    "level": 0.95
+   },
+   {
+    "k": 10,
+    "n": 20,
+    "estimate": 0.5,
+    "lower": 0.2992980081982123,
+    "upper": 0.7007019918017877,
+    "level": 0.95
+   },
+   {
+    "k": 19,
+    "n": 20,
+    "estimate": 0.95,
+    "lower": 0.763868806553258,
+    "upper": 0.9911185511992047,
+    "level": 0.95
+   },
+   {
+    "k": 20,
+    "n": 20,
+    "estimate": 1.0,
+    "lower": 0.8388748419471806,
+    "upper": 1.0,
+    "level": 0.95
+   },
+   {
+    "k": 59,
+    "n": 154,
+    "estimate": 0.38311688311688313,
+    "lower": 0.3100670887847909,
+    "upper": 0.4618559517840655,
+    "level": 0.95
+   },
+   {
+    "k": 68,
+    "n": 154,
+    "estimate": 0.44155844155844154,
+    "lower": 0.36550003153115834,
+    "upper": 0.5204614887532699,
+    "level": 0.95
+   },
+   {
+    "k": 13,
+    "n": 154,
+    "estimate": 0.08441558441558442,
+    "lower": 0.04999525563471405,
+    "upper": 0.13906444416566377,
+    "level": 0.95
+   }
+  ],
+  "wilson_90": {
+   "k": 7,
+   "n": 20,
+   "level": 0.9,
+   "lower": 0.202260040056761,
+   "upper": 0.5334873111515284
+  },
+  "mcnemar": [
+   {
+    "b": 0,
+    "c": 0,
+    "exact_p": 1.0,
+    "chi2": 0.0,
+    "chi2_p": 1.0
+   },
+   {
+    "b": 3,
+    "c": 0,
+    "exact_p": 0.25,
+    "chi2": 1.3333333333333333,
+    "chi2_p": 0.24821307898992026
+   },
+   {
+    "b": 5,
+    "c": 1,
+    "exact_p": 0.21875,
+    "chi2": 1.5,
+    "chi2_p": 0.22067136191984327
+   },
+   {
+    "b": 10,
+    "c": 4,
+    "exact_p": 0.1795654296875,
+    "chi2": 1.7857142857142858,
+    "chi2_p": 0.18144920772141646
+   },
+   {
+    "b": 12,
+    "c": 21,
+    "exact_p": 0.16275565745308995,
+    "chi2": 1.9393939393939394,
+    "chi2_p": 0.16373435432458822
+   },
+   {
+    "b": 31,
+    "c": 22,
+    "exact_p": 0.27167916606550335,
+    "chi2": 1.2075471698113207,
+    "chi2_p": 0.2718184432554919
+   },
+   {
+    "b": 1,
+    "c": 30,
+    "exact_p": 2.9802322387695312e-08,
+    "chi2": 25.29032258064516,
+    "chi2_p": 4.931769268078334e-07
+   }
+  ],
+  "cohens_h": [
+   [
+    0.383,
+    0.4416,
+    -0.11912267171653523
+   ],
+   [
+    0.5,
+    0.5,
+    0.0
+   ],
+   [
+    0.9,
+    0.1,
+    1.8545904360032246
+   ],
+   [
+    0.0,
+    1.0,
+    -3.141592653589793
+   ],
+   [
+    0.65,
+    0.4,
+    0.5060505748057285
+   ]
+  ],
+  "classification": [
+   {
+    "gold": [
+     "NOT_ENOUGH_INFO",
+     "DISPUTED",
+     "SUPPORTS",
+     "DISPUTED",
+     "REFUTES",
+     "NOT_ENOUGH_INFO",
+     "NOT_ENOUGH_INFO",
+     "REFUTES",
+     "DISPUTED",
+     "SUPPORTS",
+     "REFUTES",
+     "REFUTES",
+     "NOT_ENOUGH_INFO",
+     "REFUTES",
+     "SUPPORTS",
+     "SUPPORTS",
+     "SUPPORTS",
+     "SUPPORTS",
+     "SUPPORTS",
+     "DISPUTED",
+     "SUPPORTS",
+     "NOT_ENOUGH_INFO",
+     "DISPUTED",
+     "SUPPORTS",
+     "REFUTES",
+     "REFUTES",
+     "REFUTES",
+     "DISPUTED",
+     "SUPPORTS",
+     "DISPUTED"
+    ],
+    "pred": [
+     "DISPUTED",
+     "DISPUTED",
+     "SUPPORTS",
+     "REFUTES",
+     "NOT_ENOUGH_INFO",
+     "REFUTES",
+     "NOT_ENOUGH_INFO",
+     "NOT_ENOUGH_INFO",
+     "NOT_ENOUGH_INFO",
+     "SUPPORTS",
+     "DISPUTED",
+     "NOT_ENOUGH_INFO",
+     "DISPUTED",
+     "REFUTES",
+     "REFUTES",
+     "DISPUTED",
+     "SUPPORTS",
+     "SUPPORTS",
+     "REFUTES",
+     "NOT_ENOUGH_INFO",
+     "SUPPORTS",
+     "DISPUTED",
+     "REFUTES",
+     "SUPPORTS",
+     "NOT_ENOUGH_INFO",
+     "DISPUTED",
+     "DISPUTED",
+     "DISPUTED",
+     "REFUTES",
+     "SUPPORTS"
+    ],
+    "labels": [
+     "DISPUTED",
+     "NOT_ENOUGH_INFO",
+     "REFUTES",
+     "SUPPORTS"
+    ],
+    "accuracy": 0.3333333333333333,
+    "precision": [
+     0.2222222222222222,
+     0.14285714285714285,
+     0.14285714285714285,
+     0.8571428571428571
+    ],
+    "recall": [
+     0.2857142857142857,
+     0.2,
+     0.125,
+     0.6
+    ],
+    "f1": [
+     0.25,
+     0.16666666666666666,
+     0.13333333333333333,
+     0.7058823529411765
+    ],
+    "support": [
+     7,
+     5,
+     8,
+     10
+    ],
+    "macro_f1": 0.3139705882352941
+   },
+   {
+    "gold": [
+     "NOT_ENOUGH_INFO",
+     "NOT_ENOUGH_INFO",
+     "NOT_ENOUGH_INFO",
+     "SUPPORTS",
+     "SUPPORTS",
+     "REFUTES",
+     "REFUTES",
+     "REFUTES",
+     "NOT_ENOUGH_INFO",
+     "SUPPORTS",
+     "REFUTES",
+     "SUPPORTS"
+    ],
+    "pred": [
+     "SUPPORTS",
+     "NOT_ENOUGH_INFO",
+     "SUPPORTS",
+     "SUPPORTS",
+     "SUPPORTS",
+     "SUPPORTS",
+     "SUPPORTS",
+     "NOT_ENOUGH_INFO",
+     "REFUTES",
+     "REFUTES",
+     "SUPPORTS",
+     "NOT_ENOUGH_INFO"
+    ],
+    "labels": [
+     "NOT_ENOUGH_INFO",
+     "REFUTES",
+     "SUPPORTS"
+    ],
+    "accuracy": 0.25,
+    "precision": [
+     0.3333333333333333,
+     0.0,
+     0.2857142857142857
+    ],
+    "recall": [
+     0.25,
+     0.0,
+     0.5
+    ],
+    "f1": [
+     0.2857142857142857,
+     0.0,
+     0.36363636363636365
+    ],
+    "support": [
+     4,
+     4,
+     4
+    ],
+    "macro_f1": 0.21645021645021645
+   },
+   {
+    "gold": [
+     "DISPUTED",
+     "SUPPORTS",
+     "SUPPORTS",
+     "REFUTES",
+     "SUPPORTS",
+     "DISPUTED",
+     "NOT_ENOUGH_INFO",
+     "NOT_ENOUGH_INFO",
+     "REFUTES",
+     "NOT_ENOUGH_INFO",
+     "DISPUTED",
+     "SUPPORTS",
+     "DISPUTED",
+     "SUPPORTS",
+     "REFUTES",
+     "DISPUTED",
+     "DISPUTED",
+     "SUPPORTS",
+     "DISPUTED",
+     "DISPUTED",
+     "REFUTES",
+     "REFUTES",
+     "DISPUTED",
+     "DISPUTED",
+     "NOT_ENOUGH_INFO",
+     "REFUTES",
+     "SUPPORTS",
+     "DISPUTED",
+     "REFUTES",
+     "NOT_ENOUGH_INFO",
+     "NOT_ENOUGH_INFO",
+     "SUPPORTS",
+     "REFUTES",
+     "NOT_ENOUGH_INFO",
+     "SUPPORTS",
+     "NOT_ENOUGH_INFO",
+     "DISPUTED",
+     "NOT_ENOUGH_INFO",
+     "NOT_ENOUGH_INFO",
+     "REFUTES",
+     "DISPUTED",
+     "SUPPORTS",
+     "REFUTES",
+     "NOT_ENOUGH_INFO",
+     "NOT_ENOUGH_INFO",
+     "SUPPORTS",
+     "SUPPORTS",
+     "NOT_ENOUGH_INFO",
+     "DISPUTED",
+     "NOT_ENOUGH_INFO",
+     "DISPUTED",
+     "REFUTES",
+     "REFUTES",
+     "DISPUTED",
+     "SUPPORTS",
+     "SUPPORTS",
+     "SUPPORTS",
+     "REFUTES",
+     "SUPPORTS",
+     "DISPUTED",
+     "DISPUTED",
+     "REFUTES",
+     "SUPPORTS",
+     "NOT_ENOUGH_INFO",
+     "SUPPORTS",
+     "NOT_ENOUGH_INFO",
+     "SUPPORTS",
+     "DISPUTED",
+     "NOT_ENOUGH_INFO",
+     "DISPUTED",
+     "NOT_ENOUGH_INFO",
+     "NOT_ENOUGH_INFO",
+     "REFUTES",
+     "DISPUTED",
+     "SUPPORTS",
+     "SUPPORTS",
+     "REFUTES",
+     "NOT_ENOUGH_INFO",
+     "REFUTES",
+     "DISPUTED",
+     "DISPUTED",
+     "REFUTES",
+     "REFUTES",
+     "NOT_ENOUGH_INFO",
+     "NOT_ENOUGH_INFO",
+     "REFUTES",
+     "NOT_ENOUGH_INFO",
+     "DISPUTED",
+     "NOT_ENOUGH_INFO",
+     "REFUTES",
+     "REFUTES",
+     "REFUTES",
+     "SUPPORTS",
+     "SUPPORTS",
+     "DISPUTED",
+     "REFUTES",
+     "REFUTES",
+     "NOT_ENOUGH_INFO",
+     "NOT_ENOUGH_INFO",
+     "DISPUTED",
+     "NOT_ENOUGH_INFO",
+     "DISPUTED",
+     "NOT_ENOUGH_INFO",
+     "REFUTES",
+     "REFUTES",
+     "DISPUTED",
+     "NOT_ENOUGH_INFO",
+     "SUPPORTS",
+     "DISPUTED",
+     "DISPUTED",
+     "SUPPORTS",
+     "SUPPORTS",
+     "NOT_ENOUGH_INFO",
+     "REFUTES",
+     "REFUTES",
+     "SUPPORTS",
+     "SUPPORTS",
+     "DISPUTED",
+     "DISPUTED",
+     "DISPUTED",
+     "NOT_ENOUGH_INFO",
+     "SUPPORTS",
+     "REFUTES",
+     "NOT_ENOUGH_INFO",
+     "DISPUTED",
+     "REFUTES",
+     "NOT_ENOUGH_INFO",
+     "REFUTES",
+     "NOT_ENOUGH_INFO",
+     "NOT_ENOUGH_INFO",
+     "NOT_ENOUGH_INFO",
+     "SUPPORTS",
+     "DISPUTED",
+     "DISPUTED",
+     "DISPUTED",
+     "REFUTES",
+     "REFUTES",
+     "REFUTES",
+     "REFUTES",
+     "SUPPORTS",
+     "NOT_ENOUGH_INFO",
+     "SUPPORTS",
+     "DISPUTED",
+     "SUPPORTS",
+     "NOT_ENOUGH_INFO",
+     "REFUTES",
+     "SUPPORTS",
+     "DISPUTED",
+     "REFUTES",
+     "DISPUTED",
+     "SUPPORTS",
+     "REFUTES",
+     "REFUTES",
+     "REFUTES"
+    ],
+    "pred": [
+     "SUPPORTS",
+     "NOT_ENOUGH_INFO",
+     "REFUTES",
+     "DISPUTED",
+     "SUPPORTS",
+     "REFUTES",
+     "SUPPORTS",
+     "DISPUTED",
+     "NOT_ENOUGH_INFO",
+     "REFUTES",
+     "DISPUTED",
+     "NOT_ENOUGH_INFO",
+     "DISPUTED",
+     "NOT_ENOUGH_INFO",
+     "NOT_ENOUGH_INFO",
+     "NOT_ENOUGH_INFO",
+     "SUPPORTS",
+     "NOT_ENOUGH_INFO",
+     "DISPUTED",
+     "NOT_ENOUGH_INFO",
+     "REFUTES",
+     "SUPPORTS",
+     "NOT_ENOUGH_INFO",
+     "SUPPORTS",
+     "DISPUTED",
+     "SUPPORTS",
+     "REFUTES",
+     "SUPPORTS",
+     "NOT_ENOUGH_INFO",
+     "SUPPORTS",
+     "REFUTES",
+     "SUPPORTS",
+     "DISPUTED",
+     "SUPPORTS",
+     "SUPPORTS",
+     "NOT_ENOUGH_INFO",
+     "SUPPORTS",
+     "DISPUTED",
+     "DISPUTED",
+     "REFUTES",
+     "REFUTES",
+     "REFUTES",
+     "NOT_ENOUGH_INFO",
+     "REFUTES",
+     "REFUTES",
+     "NOT_ENOUGH_INFO",
+     "SUPPORTS",
+     "DISPUTED",
+     "REFUTES",
+     "DISPUTED",
+     "REFUTES",
+     "REFUTES",
+     "DISPUTED",
+     "NOT_ENOUGH_INFO",
+     "SUPPORTS",
+     "REFUTES",
+     "SUPPORTS",
+     "DISPUTED",
+     "REFUTES",
+     "SUPPORTS",
+     "NOT_ENOUGH_INFO",
+     "DISPUTED",
+     "SUPPORTS",
+     "NOT_ENOUGH_INFO",
+     "REFUTES",
+     "NOT_ENOUGH_INFO",
+     "DISPUTED",
+     "NOT_ENOUGH_INFO",
+     "NOT_ENOUGH_INFO",
+     "REFUTES",
+     "NOT_ENOUGH_INFO",
+     "REFUTES",
+     "NOT_ENOUGH_INFO",
+     "SUPPORTS",
+     "SUPPORTS",
+     "SUPPORTS",
+     "DISPUTED",
+     "NOT_ENOUGH_INFO",
+     "REFUTES",
+     "REFUTES",
+     "SUPPORTS",
+     "DISPUTED",
+     "DISPUTED",
+     "SUPPORTS",
+     "NOT_ENOUGH_INFO",
+     "NOT_ENOUGH_INFO",
+     "REFUTES",
+     "REFUTES",
+     "DISPUTED",
+     "NOT_ENOUGH_INFO",
+     "REFUTES",
+     "NOT_ENOUGH_INFO",
+     "NOT_ENOUGH_INFO",
+     "NOT_ENOUGH_INFO",
+     "DISPUTED",
+     "NOT_ENOUGH_INFO",
+     "NOT_ENOUGH_INFO",
+     "REFUTES",
+     "NOT_ENOUGH_INFO",
+     "NOT_ENOUGH_INFO",
+     "DISPUTED",
+     "SUPPORTS",
+     "REFUTES",
+     "NOT_ENOUGH_INFO",
+     "REFUTES",
+     "NOT_ENOUGH_INFO",
+     "DISPUTED",
+     "SUPPORTS",
+     "SUPPORTS",
+     "DISPUTED",
+     "NOT_ENOUGH_INFO",
+     "NOT_ENOUGH_INFO",
+     "DISPUTED",
+     "DISPUTED",
+     "SUPPORTS",
+     "REFUTES",
+     "DISPUTED",
+     "REFUTES",
+     "REFUTES",
+     "REFUTES",
+     "SUPPORTS",
+     "SUPPORTS",
+     "DISPUTED",
+     "SUPPORTS",
+     "SUPPORTS",
+     "SUPPORTS",
+     "REFUTES",
+     "DISPUTED",
+     "REFUTES",
+     "SUPPORTS",
+     "REFUTES",
+     "NOT_ENOUGH_INFO",
+     "REFUTES",
+     "SUPPORTS",
+     "SUPPORTS",
+     "SUPPORTS",
+     "REFUTES",
+     "SUPPORTS",
+     "NOT_ENOUGH_INFO",
+     "NOT_ENOUGH_INFO",
+     "REFUTES",
+     "NOT_ENOUGH_INFO",
+     "SUPPORTS",
+     "NOT_ENOUGH_INFO",
+     "SUPPORTS",
+     "REFUTES",
+     "SUPPORTS",
+     "REFUTES",
+     "REFUTES",
+     "REFUTES",
+     "SUPPORTS",
+     "DISPUTED",
+     "REFUTES",
+     "SUPPORTS"
+    ],
+    "labels": [
+     "DISPUTED",
+     "NOT_ENOUGH_INFO",
+     "REFUTES",
+     "SUPPORTS"
+    ],
+    "accuracy": 0.23376623376623376,
+    "precision": [
+     0.1724137931034483,
+     0.1951219512195122,
+     0.23809523809523808,
+     0.30952380952380953
+    ],
+    "recall": [
+     0.125,
+     0.21052631578947367,
+     0.24390243902439024,
+     0.37142857142857144
+    ],
+    "f1": [
+     0.14492753623188406,
+     0.20253164556962025,
+     0.24096385542168675,
+     0.33766233766233766
+    ],
+    "support": [
+     40,
+     38,
+     41,
+     35
+    ],
+    "macro_f1": 0.2315213437213822
+   },
+   {
+    "gold": [
+     "SUPPORTS",
+     "SUPPORTS",
+     "REFUTES",
+     "REFUTES",
+     "DISPUTED"
+    ],
+    "pred": [
+     "SUPPORTS",
+     "NOT_ENOUGH_INFO",
+     "REFUTES",
+     "SUPPORTS",
+     "SUPPORTS"
+    ],
+    "labels": [
+     "DISPUTED",
+     "NOT_ENOUGH_INFO",
+     "REFUTES",
+     "SUPPORTS"
+    ],
+    "accuracy": 0.4,
+    "precision": [
+     0.0,
+     0.0,
+     1.0,
+     0.3333333333333333
+    ],
+    "recall": [
+     0.0,
+     0.0,
+     0.5,
+     0.5
+    ],
+    "f1": [
+     0.0,
+     0.0,
+     0.6666666666666666,
+     0.4
+    ],
+    "support": [
+     1,
+     0,
+     2,
+     2
+    ],
+    "macro_f1": 0.26666666666666666
+   }
+  ],
+  "bootstrap_mean": {
+   "x": [
+    8.900729,
+    3.400193,
+    1.721903,
+    0.273796,
+    1.170947,
+    2.963219,
+    1.993893,
+    0.962828,
+    3.554236,
+    4.85115,
+    2.547273,
+    3.711133,
+    2.162386,
+    8.431386,
+    2.057389,
+    1.146307,
+    4.628047,
+    2.681442,
+    1.064084,
+    3.074455,
+    1.733834,
+    2.550933,
+    6.329287,
+    2.894418,
+    2.122753,
+    3.81016,
+    2.106635,
+    2.970528,
+    4.088701,
+    0.479873,
+    1.05921,
+    4.141222,
+    0.217059,
+    3.190526,
+    7.018518,
+    3.251312,
+    6.3306,
+    1.846205,
+    7.375823,
+    4.261614
+   ],
+   "resamples": 2000,
+   "seed": 99,
+   "estimate": 3.226900175,
+   "lower": 2.5704254743750004,
+   "upper": 3.92544809,
+   "se": 0.34502616001908043,
+   "scipy_percentile": [
+    2.5869309743750004,
+    3.9084769412500004
+   ]
+  },
+  "bootstrap_macro_f1": {
+   "gold": [
+    "NOT_ENOUGH_INFO",
+    "DISPUTED",
+    "SUPPORTS",
+    "DISPUTED",
+    "REFUTES",
+    "NOT_ENOUGH_INFO",
+    "NOT_ENOUGH_INFO",
+    "REFUTES",
+    "DISPUTED",
+    "SUPPORTS",
+    "REFUTES",
+    "REFUTES",
+    "NOT_ENOUGH_INFO",
+    "REFUTES",
+    "SUPPORTS",
+    "SUPPORTS",
+    "SUPPORTS",
+    "SUPPORTS",
+    "SUPPORTS",
+    "DISPUTED",
+    "SUPPORTS",
+    "NOT_ENOUGH_INFO",
+    "DISPUTED",
+    "SUPPORTS",
+    "REFUTES",
+    "REFUTES",
+    "REFUTES",
+    "DISPUTED",
+    "SUPPORTS",
+    "DISPUTED"
+   ],
+   "pred": [
+    "DISPUTED",
+    "DISPUTED",
+    "SUPPORTS",
+    "REFUTES",
+    "NOT_ENOUGH_INFO",
+    "REFUTES",
+    "NOT_ENOUGH_INFO",
+    "NOT_ENOUGH_INFO",
+    "NOT_ENOUGH_INFO",
+    "SUPPORTS",
+    "DISPUTED",
+    "NOT_ENOUGH_INFO",
+    "DISPUTED",
+    "REFUTES",
+    "REFUTES",
+    "DISPUTED",
+    "SUPPORTS",
+    "SUPPORTS",
+    "REFUTES",
+    "NOT_ENOUGH_INFO",
+    "SUPPORTS",
+    "DISPUTED",
+    "REFUTES",
+    "SUPPORTS",
+    "NOT_ENOUGH_INFO",
+    "DISPUTED",
+    "DISPUTED",
+    "DISPUTED",
+    "REFUTES",
+    "SUPPORTS"
+   ],
+   "resamples": 500,
+   "seed": 7,
+   "estimate": 0.3139705882352941,
+   "lower": 0.16978169856459333,
+   "upper": 0.45927220575318395,
+   "se": 0.07551884346976273
+  }
+ },
+ "baseline": {
+  "n": 154,
+  "resamples": 10000,
+  "seed": 2026,
+  "protocols": {
+   "batch": {
+    "accuracy": {
+     "k": 59,
+     "n": 154,
+     "estimate": 0.38311688311688313,
+     "lower": 0.3100670887847909,
+     "upper": 0.4618559517840655
+    },
+    "accuracy_bootstrap": {
+     "estimate": 0.38311688311688313,
+     "lower": 0.3051948051948052,
+     "upper": 0.461038961038961,
+     "se": 0.038953866452692526
+    },
+    "macro_f1": {
+     "estimate": 0.21519832189168572,
+     "lower": 0.172204645244194,
+     "upper": 0.25625289351851843,
+     "se": 0.021547495644711603
+    },
+    "labels": [
+     "DISPUTED",
+     "NOT_ENOUGH_INFO",
+     "REFUTES",
+     "SUPPORTS"
+    ],
+    "per_class": {
+     "precision": [
+      0.0,
+      0.3333333333333333,
+      0.0,
+      0.4077669902912621
+     ],
+     "recall": [
+      0.0,
+      0.4146341463414634,
+      0.0,
+      0.6176470588235294
+     ],
+     "f1": [
+      0.0,
+      0.3695652173913043,
+      0.0,
+      0.49122807017543857
+     ],
+     "support": [
+      18,
+      41,
+      27,
+      68
+     ]
+    }
+   },
+   "single": {
+    "accuracy": {
+     "k": 58,
+     "n": 154,
+     "estimate": 0.37662337662337664,
+     "lower": 0.3039760705318012,
+     "upper": 0.45527602784643606
+    },
+    "accuracy_bootstrap": {
+     "estimate": 0.37662337662337664,
+     "lower": 0.2987012987012987,
+     "upper": 0.45454545454545453,
+     "se": 0.039238889514402596
+    },
+    "macro_f1": {
+     "estimate": 0.2000669344042838,
+     "lower": 0.15711730723180076,
+     "upper": 0.24104393390592452,
+     "se": 0.02131959782431643
+    },
+    "labels": [
+     "DISPUTED",
+     "NOT_ENOUGH_INFO",
+     "REFUTES",
+     "SUPPORTS"
+    ],
+    "per_class": {
+     "precision": [
+      0.0,
+      0.2857142857142857,
+      0.0,
+      0.4107142857142857
+     ],
+     "recall": [
+      0.0,
+      0.2926829268292683,
+      0.0,
+      0.6764705882352942
+     ],
+     "f1": [
+      0.0,
+      0.2891566265060241,
+      0.0,
+      0.5111111111111111
+     ],
+     "support": [
+      18,
+      41,
+      27,
+      68
+     ]
+    }
+   },
+   "gold_evidence": {
+    "accuracy": {
+     "k": 89,
+     "n": 154,
+     "estimate": 0.577922077922078,
+     "lower": 0.49895305166842124,
+     "upper": 0.6530982546190078
+    },
+    "accuracy_bootstrap": {
+     "estimate": 0.577922077922078,
+     "lower": 0.5,
+     "upper": 0.6558441558441559,
+     "se": 0.03956591480643109
+    },
+    "macro_f1": {
+     "estimate": 0.343662143992177,
+     "lower": 0.3053410838857836,
+     "upper": 0.3780369956987657,
+     "se": 0.01862515678241695
+    },
+    "labels": [
+     "DISPUTED",
+     "NOT_ENOUGH_INFO",
+     "REFUTES",
+     "SUPPORTS"
+    ],
+    "per_class": {
+     "precision": [
+      0.0,
+      0.6166666666666667,
+      0.0,
+      0.5531914893617021
+     ],
+     "recall": [
+      0.0,
+      0.9024390243902439,
+      0.0,
+      0.7647058823529411
+     ],
+     "f1": [
+      0.0,
+      0.7326732673267327,
+      0.0,
+      0.6419753086419753
+     ],
+     "support": [
+      18,
+      41,
+      27,
+      68
+     ]
+    }
+   }
+  },
+  "majority": {
+   "accuracy": {
+    "k": 68,
+    "n": 154,
+    "estimate": 0.44155844155844154,
+    "lower": 0.36550003153115834,
+    "upper": 0.5204614887532699
+   },
+   "accuracy_bootstrap": {
+    "estimate": 0.44155844155844154,
+    "lower": 0.36363636363636365,
+    "upper": 0.5194805194805194,
+    "se": 0.04056869174037392
+   },
+   "macro_f1": {
+    "estimate": 0.15315315315315314,
+    "lower": 0.13333333333333333,
+    "upper": 0.17094017094017094,
+    "se": 0.009796859465411728
+   },
+   "labels": [
+    "DISPUTED",
+    "NOT_ENOUGH_INFO",
+    "REFUTES",
+    "SUPPORTS"
+   ],
+   "per_class": {
+    "precision": [
+     0.0,
+     0.0,
+     0.0,
+     0.44155844155844154
+    ],
+    "recall": [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "f1": [
+     0.0,
+     0.0,
+     0.0,
+     0.6126126126126126
+    ],
+    "support": [
+     18,
+     41,
+     27,
+     68
+    ]
+   }
+  },
+  "classifier_vs_majority": {
+   "difference": {
+    "estimate": -0.058441558441558406,
+    "lower": -0.14285714285714285,
+    "upper": 0.025974025974025976,
+    "se": 0.04249045261393262
+   },
+   "macro_f1_difference": {
+    "estimate": 0.06204516873853258,
+    "lower": 0.016948806860190162,
+    "upper": 0.10503348015642233,
+    "se": 0.022512463033168444
+   },
+   "b": 17,
+   "c": 26,
+   "exact_p": 0.2220528201560228,
+   "cohens_h": -0.11879854684406155
+  },
+  "gold_vs_retrieved": {
+   "difference": {
+    "estimate": 0.19480519480519481,
+    "lower": 0.11038961038961038,
+    "upper": 0.2792207792207792,
+    "se": 0.04404484163136251
+   },
+   "macro_f1_difference": {
+    "estimate": 0.12846382210049126,
+    "lower": 0.07682417119672877,
+    "upper": 0.17988774871230265,
+    "se": 0.026352384290590797
+   },
+   "b": 41,
+   "c": 11,
+   "exact_p": 3.5887916129517805e-05,
+   "cohens_h": 0.39243144304327804
+  },
+  "retrieval": {
+   "precision": {
+    "estimate": 0.06493506493506493,
+    "lower": 0.0303030303030303,
+    "upper": 0.10497835497835499,
+    "se": 0.019148714979143288
+   },
+   "recall": {
+    "estimate": 0.041666666666666664,
+    "lower": 0.01861471861471861,
+    "upper": 0.06915584415584415,
+    "se": 0.013036839558068962
+   },
+   "f": {
+    "estimate": 0.04299207286220274,
+    "lower": 0.02044379321976725,
+    "upper": 0.06948628211615226,
+    "se": 0.012552204904076242
+   },
+   "any_gold_found": {
+    "k": 13,
+    "n": 154,
+    "estimate": 0.08441558441558442,
+    "lower": 0.04999525563471405,
+    "upper": 0.13906444416566377
+   }
+  },
+  "harmonic_mean": {
+   "estimate": 0.07730881373218297,
+   "lower": 0.03862905541486583,
+   "upper": 0.1173669506809593,
+   "se": 0.02018013332058535
+  },
+  "by_label": [
+   {
+    "label": "SUPPORTS",
+    "n": 68,
+    "predicted_as": {
+     "SUPPORTS": 42,
+     "REFUTES": 0,
+     "NOT_ENOUGH_INFO": 26,
+     "DISPUTED": 0
+    },
+    "recall": {
+     "k": 42,
+     "n": 68,
+     "estimate": 0.6176470588235294,
+     "lower": 0.4988071245222142,
+     "upper": 0.7239055021789457
+    },
+    "mean_evidence_f": {
+     "estimate": 0.04586834733893557,
+     "lower": 0.00980392156862745,
+     "upper": 0.09243697478991596,
+     "se": 0.021266602023550206
+    },
+    "any_gold_found": {
+     "k": 5,
+     "n": 68,
+     "estimate": 0.07352941176470588,
+     "lower": 0.031814844251117996,
+     "upper": 0.16085188395717748
+    }
+   },
+   {
+    "label": "REFUTES",
+    "n": 27,
+    "predicted_as": {
+     "SUPPORTS": 20,
+     "REFUTES": 0,
+     "NOT_ENOUGH_INFO": 7,
+     "DISPUTED": 0
+    },
+    "recall": {
+     "k": 0,
+     "n": 27,
+     "estimate": 0.0,
+     "lower": 0.0,
+     "upper": 0.12455502974186705
+    },
+    "mean_evidence_f": {
+     "estimate": 0.014814814814814815,
+     "lower": 0.0,
+     "upper": 0.04444444444444445,
+     "se": 0.014443952478038742
+    },
+    "any_gold_found": {
+     "k": 1,
+     "n": 27,
+     "estimate": 0.037037037037037035,
+     "lower": 0.006568145980785103,
+     "upper": 0.18283465933575843
+    }
+   },
+   {
+    "label": "NOT_ENOUGH_INFO",
+    "n": 41,
+    "predicted_as": {
+     "SUPPORTS": 24,
+     "REFUTES": 0,
+     "NOT_ENOUGH_INFO": 17,
+     "DISPUTED": 0
+    },
+    "recall": {
+     "k": 17,
+     "n": 41,
+     "estimate": 0.4146341463414634,
+     "lower": 0.27756549454252133,
+     "upper": 0.5663289686596986
+    },
+    "mean_evidence_f": {
+     "estimate": 0.030936543131665082,
+     "lower": 0.004434589800443458,
+     "upper": 0.06768028719248231,
+     "se": 0.016731557548996034
+    },
+    "any_gold_found": {
+     "k": 4,
+     "n": 41,
+     "estimate": 0.0975609756097561,
+     "lower": 0.03859708489808934,
+     "upper": 0.22547681305523387
+    }
+   },
+   {
+    "label": "DISPUTED",
+    "n": 18,
+    "predicted_as": {
+     "SUPPORTS": 17,
+     "REFUTES": 0,
+     "NOT_ENOUGH_INFO": 1,
+     "DISPUTED": 0
+    },
+    "recall": {
+     "k": 0,
+     "n": 18,
+     "estimate": 0.0,
+     "lower": 0.0,
+     "upper": 0.17587922364665765
+    },
+    "mean_evidence_f": {
+     "estimate": 0.10185185185185183,
+     "lower": 0.0,
+     "upper": 0.21296296296296294,
+     "se": 0.054123802504856114
+    },
+    "any_gold_found": {
+     "k": 3,
+     "n": 18,
+     "estimate": 0.16666666666666666,
+     "lower": 0.05836576805861446,
+     "upper": 0.39222038103915724
+    }
+   }
+  ]
+ }
+}

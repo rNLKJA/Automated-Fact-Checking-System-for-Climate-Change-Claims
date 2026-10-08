@@ -42,8 +42,23 @@ export function SiteFooter() {
               </a>
             </li>
             <li>
-              <Link className="underline-offset-4 hover:underline" href="/method#data">
+              <Link className="underline-offset-4 hover:underline" href="/methods#data">
                 Data &amp; provenance
+              </Link>
+            </li>
+            <li>
+              <Link className="underline-offset-4 hover:underline" href="/methods#decisions">
+                Methods &amp; decision records
+              </Link>
+            </li>
+            <li>
+              <Link className="underline-offset-4 hover:underline" href="/methods/model-card">
+                Model card
+              </Link>
+            </li>
+            <li>
+              <Link className="underline-offset-4 hover:underline" href="/ai-log">
+                AI audit log (this browser)
               </Link>
             </li>
           </ul>
