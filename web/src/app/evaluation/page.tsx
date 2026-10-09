@@ -59,7 +59,8 @@ export default function EvaluationPage() {
               Accuracy (Wilson interval), macro-F1 and the paired difference (bootstrap,{" "}
               {int(HARNESS_BOOTSTRAP.resamples)} resamples, seed {HARNESS_BOOTSTRAP.seed}),
               McNemar&rsquo;s exact test, Cohen&rsquo;s h, citation validity, the course&rsquo;s
-              harmonic mean, latency and tokens.
+              harmonic mean, latency and tokens. Macro-F1 averages both systems over the same
+              labels: those in the gold set or in either system&rsquo;s verdicts.
             </Card>
           </div>
           <div className="grid gap-4 lg:grid-cols-[1.2fr_1fr]">
@@ -121,6 +122,18 @@ export default function EvaluationPage() {
               An LLM that follows its instructions will often answer &ldquo;not enough info&rdquo;
               on retrieved passages that miss the point, and be marked wrong. That is the retrieval
               bottleneck showing, which is why the gold condition is there.
+            </li>
+            <li>
+              <span className="text-foreground">The gold condition favours the classifier.</span>{" "}
+              Its gold-evidence verdicts come from the training epoch chosen by accuracy on these
+              same dev claims with gold evidence, so its score there is optimistic and the
+              LLM-minus-classifier gap is understated.
+            </li>
+            <li>
+              <span className="text-foreground">Citations are scored strictly.</span> In evidence F,
+              every distinct id the LLM cites counts as a prediction, so an id it was never shown is
+              a wrong one, just as a wrong retrieved passage is for the 2024 system. Citation
+              validity is recomputed from the cited ids, including for loaded files.
             </li>
             <li>
               <span className="text-foreground">Possible contamination.</span> The claims, labels

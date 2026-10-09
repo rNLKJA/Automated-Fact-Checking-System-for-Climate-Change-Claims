@@ -9,8 +9,10 @@ import {
   auditToJson,
   createIndexedDbAuditStore,
   createMemoryAuditStore,
+  isReviewable,
   newAuditEntry,
   redactSecrets,
+  substitutedModel,
   type AuditEntry,
   type AuditStore,
   type NewAuditEntry,
@@ -54,6 +56,22 @@ describe("audit entries", () => {
     expect(JSON.stringify(e)).toContain("[redacted key]");
     // short or empty "secrets" are not used for redaction (would mangle normal text)
     expect(redactSecrets({ a: "abc" }, ["", "ab"])).toEqual({ a: "abc" });
+  });
+
+  it("tells a dated snapshot of the requested model from a different model", () => {
+    expect(substitutedModel("claude-haiku-4-5", "claude-haiku-4-5")).toBeNull();
+    expect(substitutedModel("claude-haiku-4-5", "claude-haiku-4-5-20251001")).toBeNull();
+    expect(substitutedModel("gpt-5-mini", "gpt-5-mini-2025-08-07")).toBeNull();
+    expect(substitutedModel("gpt-5-mini", null)).toBeNull();
+    expect(substitutedModel("claude-sonnet-5-5", "claude-opus-4-1")).toBe("claude-opus-4-1");
+    expect(substitutedModel("gpt-5", "gpt-5-mini-2025-08-07")).toBe("gpt-5-mini-2025-08-07");
+  });
+
+  it("counts only answered calls as reviewable", () => {
+    expect(isReviewable(newAuditEntry(fields(), KEY))).toBe(true);
+    expect(
+      isReviewable(newAuditEntry(fields({ error: { kind: "network", message: "x" } }), KEY)),
+    ).toBe(false);
   });
 
   it("records human decisions, keeping an edit only for 'edited'", () => {

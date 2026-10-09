@@ -1,6 +1,8 @@
 export const SITE = {
   name: "Climate Claim Checker",
   tagline: "A 2024 student fact-checking system for climate claims, rebuilt and re-run",
+  /** the production site (documents link here so the links also work on GitHub) */
+  url: "https://comp90042-climate-fact-check.vercel.app",
   repo: "https://github.com/rNLKJA/Automated-Fact-Checking-System-for-Climate-Change-Claims",
   courseRepo: "https://github.com/drcarenhan/COMP90042_2024",
   subject: { code: "COMP90042", name: "Natural Language Processing" },

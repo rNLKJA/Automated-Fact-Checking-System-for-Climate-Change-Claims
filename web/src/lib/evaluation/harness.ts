@@ -10,9 +10,16 @@
  *   is excluded and counted; neither system is scored on that claim.
  * - An answer the model did give but that is unusable (invalid JSON, refusal,
  *   cut off) is scored as wrong ("no answer"), not excluded.
+ * - Macro-F1 averages both systems over one shared label set: the labels in
+ *   gold, the LLM's or the classifier's verdicts (re-derived per resample).
+ * - The LLM's evidence F scores every distinct id it cited, so an id it was
+ *   never shown counts as a wrong prediction, like a wrong retrieved passage.
+ * - Citation validity is always re-derived from the cited ids and the passages
+ *   shown, never read from a saved file.
  */
 import { z } from "zod";
 
+import { checkCitations, type CitationCheck } from "../ai/citations";
 import { LABELS, type Label } from "../labels";
 import { evidenceScore, harmonicMean } from "../metrics";
 import {
@@ -46,7 +53,7 @@ export const CONDITIONS: Record<Condition, { title: string; short: string; descr
       title: "Gold evidence (upper bound)",
       short: "Gold evidence",
       description:
-        "The annotators' evidence passages, as if retrieval were perfect. Both systems are compared on this too.",
+        "The annotators' evidence passages, as if retrieval were perfect. Both systems are compared on this too. The classifier's verdicts here come from the training epoch chosen on these same dev claims, so its score is optimistic and the LLM-minus-classifier gap is understated.",
     },
   };
 
@@ -156,6 +163,18 @@ export type ConditionSummary = {
   tokens: { input: number; output: number; calls: number } | null;
 };
 
+/**
+ * The cited ids checked against the passages the LLM was shown. Derived from
+ * `cited` every time, so a hand-edited `valid`/`invalid` list in a saved run
+ * cannot change the scores.
+ */
+export function citationsOf(
+  outcome: Extract<LlmOutcome, { status: "ok" }>,
+  providedIds: readonly string[],
+): CitationCheck {
+  return checkCitations(outcome.cited, providedIds);
+}
+
 export function summarizeCondition(
   condition: Condition,
   rows: readonly HarnessRow[],
@@ -169,13 +188,19 @@ export function summarizeCondition(
   const clfPred = scoredRows.map((r) => r.classifier);
   const opts = { ...options, labelSpace: LABELS };
 
-  const answers = scoredRows.flatMap((r) => (r.outcome.status === "ok" ? [r.outcome] : []));
-  const citing = answers.filter((o) => o.cited.length > 0);
-  const allValid = citing.filter((o) => o.invalid.length === 0).length;
-
-  const llmF = scoredRows.map((r) =>
-    r.outcome.status === "ok" ? evidenceScore(r.outcome.valid, r.goldIds).f : 0,
+  // citations re-derived from the cited ids and the passages shown
+  const checks = scoredRows.map((r) =>
+    r.outcome.status === "ok" ? citationsOf(r.outcome, r.providedIds) : null,
   );
+  const answers = checks.flatMap((c) => (c ? [c] : []));
+  const citing = answers.filter((c) => c.valid.length + c.invalid.length > 0);
+  const allValid = citing.filter((c) => c.invalid.length === 0).length;
+
+  // every distinct cited id is a prediction: an id it was never shown is a wrong one
+  const llmF = scoredRows.map((r, i) => {
+    const c = checks[i];
+    return c ? evidenceScore([...c.valid, ...c.invalid], r.goldIds).f : 0;
+  });
   const clfF = scoredRows.map((r) => evidenceScore(r.providedIds, r.goldIds).f);
   const llmOk = scoredRows.map((r, i) => (llmPred[i] === r.gold ? 1 : 0));
   const clfOk = scoredRows.map((r) => (r.classifier === r.gold ? 1 : 0));
@@ -194,15 +219,15 @@ export function summarizeCondition(
     scored: n,
     excluded: attempted - n,
     invalidOutputs: scoredRows.filter((r) => r.outcome.status === "invalid_output").length,
-    llm: evaluateLabels(gold, llmPred, opts),
-    classifier: evaluateLabels(gold, clfPred, opts),
+    llm: evaluateLabels(gold, llmPred, { ...opts, sharedWith: clfPred }),
+    classifier: evaluateLabels(gold, clfPred, { ...opts, sharedWith: llmPred }),
     comparison: comparePaired(gold, llmPred, clfPred, opts),
     citations: {
       answers: answers.length,
       citing: citing.length,
       allValid: wilsonInterval(allValid, citing.length, options.level),
-      idsCited: answers.reduce((a, o) => a + o.valid.length + o.invalid.length, 0),
-      idsInvalid: answers.reduce((a, o) => a + o.invalid.length, 0),
+      idsCited: answers.reduce((a, c) => a + c.valid.length + c.invalid.length, 0),
+      idsInvalid: answers.reduce((a, c) => a + c.invalid.length, 0),
     },
     evidence: {
       llm: bootstrap(n, (idx) => meanAt(llmF, idx), options),
@@ -281,14 +306,73 @@ export function rowsFor(
   });
 }
 
+/**
+ * Whether a run's claims are the seeded sample its header claims (`n` claims
+ * drawn with `seed`). A hand-picked or edited list is still scored, but shown
+ * as a custom sample.
+ */
+export function sampleMatchesSeed(
+  run: Pick<HarnessRun, "claimIds" | "n" | "seed">,
+  claims: Iterable<HarnessClaimSummary>,
+): boolean {
+  const all = [...claims].sort((a, b) => a.ord - b.ord);
+  if (run.n !== run.claimIds.length) return false;
+  const expected = sampleClaims(all, run.n, run.seed).map((c) => c.id);
+  return (
+    expected.length === run.claimIds.length && expected.every((id, i) => id === run.claimIds[i])
+  );
+}
+
+export type RunCheck = {
+  /** the run with every answer's citation check re-derived from its cited ids */
+  run: HarnessRun;
+  sampleMatchesSeed: boolean;
+  /** answers whose saved valid/invalid lists disagreed with the re-derived ones */
+  citationsCorrected: number;
+};
+
+/** Check a loaded run against the dev set and re-derive what can be re-derived. */
+export function verifyRun(
+  run: HarnessRun,
+  claims: ReadonlyMap<string, HarnessClaimSummary>,
+): RunCheck {
+  let citationsCorrected = 0;
+  const same = (a: readonly string[], b: readonly string[]) =>
+    a.length === b.length && a.every((x, i) => x === b[i]);
+  const outcomes: HarnessRun["outcomes"] = {};
+  for (const [id, byCondition] of Object.entries(run.outcomes)) {
+    const c = claims.get(id);
+    const next: Partial<Record<Condition, LlmOutcome>> = {};
+    for (const cond of CONDITION_ORDER) {
+      const o = byCondition[cond];
+      if (!o) continue;
+      if (o.status !== "ok" || !c) {
+        next[cond] = o;
+        continue;
+      }
+      const check = citationsOf(o, cond === "retrieved" ? c.retrievedIds : c.goldIds);
+      if (!same(check.valid, o.valid) || !same(check.invalid, o.invalid)) citationsCorrected++;
+      next[cond] = { ...o, valid: check.valid, invalid: check.invalid };
+    }
+    outcomes[id] = next;
+  }
+  return {
+    run: { ...run, outcomes },
+    sampleMatchesSeed: sampleMatchesSeed(run, claims.values()),
+    citationsCorrected,
+  };
+}
+
 /** Flat rows for the CSV export of a run. */
 export function runToRows(
   run: HarnessRun,
   claims: ReadonlyMap<string, HarnessClaimSummary>,
 ): Record<string, unknown>[] {
+  const seeded = sampleMatchesSeed(run, claims.values());
   return run.conditions.flatMap((condition) =>
     rowsFor(run, condition, claims).map((r) => {
       const o = r.outcome;
+      const cite = o.status === "ok" ? citationsOf(o, r.providedIds) : null;
       return {
         claim_id: r.claimId,
         condition,
@@ -299,7 +383,7 @@ export function runToRows(
         llm_correct: o.status === "error" ? null : o.status === "ok" && o.label === r.gold,
         classifier_correct: r.classifier === r.gold,
         cited_ids: o.status === "ok" ? o.cited.join(" ") : null,
-        invalid_ids: o.status === "ok" ? o.invalid.join(" ") : null,
+        invalid_ids: cite ? cite.invalid.join(" ") : null,
         rationale: o.status === "ok" ? o.rationale : null,
         error: o.status === "ok" ? null : `${o.kind}: ${o.message}`,
         latency_ms: o.status === "error" || o.latencyMs === null ? null : Math.round(o.latencyMs),
@@ -308,6 +392,7 @@ export function runToRows(
         provider: run.provider,
         model: run.model,
         seed: run.seed,
+        sample_matches_seed: seeded,
         audit_id: o.auditId,
       };
     }),
@@ -333,6 +418,7 @@ export const RUN_CSV_COLUMNS = [
   "provider",
   "model",
   "seed",
+  "sample_matches_seed",
   "audit_id",
 ] as const;
 

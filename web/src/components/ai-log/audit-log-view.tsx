@@ -13,6 +13,8 @@ import {
   auditToJson,
   FEATURE_LABEL,
   getAuditStore,
+  isReviewable,
+  substitutedModel,
   type AiFeature,
   type AuditEntry,
   type HumanDecision,
@@ -35,6 +37,9 @@ const DECISION_STYLE: Record<HumanDecision, string> = {
   edited: "bg-series-1/12 ring-series-1/35",
   rejected: "bg-refutes/10 ring-refutes/35",
 };
+
+/** The model answered, but unusably: nothing to review, and scored as wrong in evaluation. */
+const UNUSABLE = new Set(["invalid_output", "refusal", "truncated"]);
 
 function outputLabel(e: AuditEntry): Label | null {
   const o = e.output as { label?: unknown } | null;
@@ -86,7 +91,8 @@ export function AuditLogView() {
   );
   const counts = useMemo(() => {
     const c: Record<HumanDecision, number> = { pending: 0, accepted: 0, edited: 0, rejected: 0 };
-    for (const e of entries) c[e.decision]++;
+    // a failed call has nothing to review, so it never waits for review
+    for (const e of entries) if (isReviewable(e)) c[e.decision]++;
     return c;
   }, [entries]);
   const tokens = useMemo(
@@ -133,9 +139,9 @@ export function AuditLogView() {
           note={`${counts.accepted} accepted · ${counts.edited} edited · ${counts.rejected} rejected`}
         />
         <Summary
-          label="Failed calls"
+          label="Failed or stopped calls"
           value={int(entries.filter((e) => e.error).length)}
-          note="Errors are logged too."
+          note="Logged too, with nothing to review."
         />
         <Summary
           label="Tokens reported"
@@ -271,6 +277,18 @@ function EntryCard({
   const meta = e.input.meta as { claim_id?: unknown; condition?: unknown; evidence?: unknown };
   const claimId = typeof meta.claim_id === "string" ? meta.claim_id : null;
   const edited = e.edited_output as { label?: unknown } | null;
+  // records written before these fields existed lack them
+  const substitute = substitutedModel(e.model, e.served_model ?? null);
+  const attempts = e.attempts ?? null;
+  const pill = e.error
+    ? e.error.kind === "aborted"
+      ? "stopped"
+      : UNUSABLE.has(e.error.kind)
+        ? "no usable answer"
+        : "call failed"
+    : e.decision === "pending"
+      ? "awaiting review"
+      : e.decision;
 
   async function decide(decision: Exclude<HumanDecision, "pending">) {
     try {
@@ -297,7 +315,14 @@ function EntryCard({
         <span>
           {PROVIDERS[e.provider]?.label ?? e.provider} ·{" "}
           <span className="font-mono">{e.model}</span>
+          {substitute && (
+            <span className="text-destructive">
+              {" "}
+              (answered by <span className="font-mono">{substitute}</span>)
+            </span>
+          )}
         </span>
+        {attempts !== null && attempts > 1 && <span className="tabular">{attempts} attempts</span>}
         {e.latency_ms !== null && <span className="tabular">{int(e.latency_ms)} ms</span>}
         {e.usage && (
           <span className="tabular">
@@ -307,10 +332,12 @@ function EntryCard({
         <span
           className={cn(
             "ml-auto inline-flex rounded-full px-2 py-0.5 font-medium ring-1 ring-inset",
-            DECISION_STYLE[e.decision],
+            e.error
+              ? "bg-background text-muted-foreground ring-border"
+              : DECISION_STYLE[e.decision],
           )}
         >
-          {e.decision === "pending" ? "awaiting review" : e.decision}
+          {pill}
         </span>
       </header>
 

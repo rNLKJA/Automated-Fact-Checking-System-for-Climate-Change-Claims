@@ -341,7 +341,7 @@ export function BaselineUncertainty({ report }: { report: BaselineReport }) {
                       <VerdictBadge label={row.label} size="sm" />
                     </th>
                     <td className="px-3 py-3 text-right font-mono tabular">{row.n}</td>
-                    <td className="px-3 py-3 font-mono text-xs tabular">
+                    <td className="px-3 py-3 font-mono text-xs whitespace-nowrap tabular">
                       {LABELS.map((l) => row.predictedAs[l]).join(" / ")}
                     </td>
                     <td className="px-3 py-3 font-mono text-xs tabular">

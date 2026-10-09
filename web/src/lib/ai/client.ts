@@ -13,6 +13,8 @@ export type CompleteJsonRequest<T extends z.ZodType> = Omit<JsonRequest, "schema
   validator: T;
   /** extra attempts after a retryable failure (429, 529, 5xx) */
   retries?: number;
+  /** called before each retry with the failure being retried (for the audit log) */
+  onRetry?: (failure: { attempt: number; kind: string; status: number | null }) => void;
   /** injectable for tests */
   sleep?: (ms: number, signal?: AbortSignal) => Promise<void>;
   now?: () => number;
@@ -111,6 +113,7 @@ export async function completeJson<T extends z.ZodType>(
         });
       }
       if (!e.retryable || attempt >= retries || req.signal?.aborted) throw e;
+      req.onRetry?.({ attempt: attempt + 1, kind: e.kind, status: e.status ?? null });
       await sleep(backoffMs(attempt, e.retryAfterMs), req.signal);
     }
   }

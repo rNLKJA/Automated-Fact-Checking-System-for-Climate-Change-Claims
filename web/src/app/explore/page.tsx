@@ -3,10 +3,11 @@ import Link from "next/link";
 
 import { PageHeader, Stat } from "@/components/common/section";
 import { ClaimBrowser } from "@/components/explore/claim-browser";
-import { fixed, pct } from "@/lib/format";
+import { fixed, pct, pp } from "@/lib/format";
 import { PROTOCOLS } from "@/lib/types";
 import { listDevClaims } from "@/server/claims";
-import { getOverview, protocolAccuracies } from "@/server/stats";
+import { getBaselineReport } from "@/server/evaluation";
+import { getOverview } from "@/server/stats";
 
 export const metadata: Metadata = {
   title: "Explore the dev set",
@@ -17,7 +18,10 @@ export const metadata: Metadata = {
 export default function ExplorePage() {
   const claims = listDevClaims();
   const o = getOverview();
-  const acc = protocolAccuracies();
+  const b = getBaselineReport();
+  const acc = b.protocols.batch.accuracy;
+  const f = b.retrieval.f;
+  const gap = b.classifierVsMajority.difference;
   const hits = claims.filter((c) => c.nCorrect > 0).length;
   const fallback = claims.filter((c) => c.path === "fallback").length;
 
@@ -36,7 +40,7 @@ export default function ExplorePage() {
           <Stat
             label="Mean evidence F (2024 retrieval)"
             value={fixed(o.retrieval.dev_f_saved_2024, 3)}
-            note="Exactly the value in the report."
+            note={`95% CI ${fixed(f.lower, 3)} to ${fixed(f.upper, 3)}. Exactly the value in the report.`}
           />
           <Stat
             label="Claims with any gold passage found"
@@ -45,8 +49,8 @@ export default function ExplorePage() {
           />
           <Stat
             label="Verdict accuracy"
-            value={pct(acc.batch)}
-            note={`${PROTOCOLS.batch.title}. Always answering "supports" scores ${pct(o.classifier.majority_baseline_acc)}.`}
+            value={pct(acc.estimate)}
+            note={`${acc.successes} of ${acc.n} (95% CI ${pct(acc.lower)} to ${pct(acc.upper)}), ${PROTOCOLS.batch.title.toLowerCase()}. Always answering "supports" scores ${pct(b.majority.accuracy.estimate)}; the paired difference is ${pp(gap.estimate)} (95% CI ${pp(gap.lower)} to ${pp(gap.upper)}).`}
           />
           <Stat
             label="Claims on the fallback path"

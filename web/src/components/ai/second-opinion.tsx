@@ -24,7 +24,13 @@ import { cn } from "@/lib/utils";
 import { AiGeneratedBadge } from "./ai-badge";
 import { useAi } from "./ai-context";
 
-export type EvidenceOption = { key: string; label: string; passages: Passage[] };
+export type EvidenceOption = {
+  key: string;
+  label: string;
+  passages: Passage[];
+  /** the 2024 model's verdict on these same passages, to compare like with like */
+  modelLabel?: Label;
+};
 
 /**
  * Ask the visitor's own LLM for a verdict on this claim and evidence, then let
@@ -36,7 +42,6 @@ export function SecondOpinion({
   claimId,
   options,
   goldLabel,
-  modelLabel,
   className,
 }: {
   claim: string;
@@ -44,8 +49,6 @@ export function SecondOpinion({
   options: EvidenceOption[];
   /** the annotators' label, when known, to compare against */
   goldLabel?: Label | null;
-  /** the 2024 model's verdict on the same evidence, to compare against */
-  modelLabel?: Label;
   className?: string;
 }) {
   const { settings, hasKey, openSettings } = useAi();
@@ -250,9 +253,10 @@ export function SecondOpinion({
                     : `annotators said ${LABEL_TEXT[goldLabel].short.toLowerCase()}`}
                 </span>
               )}
-              {modelLabel && (
+              {usedOption.modelLabel && (
                 <span className="text-sm text-muted-foreground">
-                  · the 2024 model said {LABEL_TEXT[modelLabel].short.toLowerCase()}
+                  · the 2024 model, on the same evidence, said{" "}
+                  {LABEL_TEXT[usedOption.modelLabel].short.toLowerCase()}
                 </span>
               )}
             </div>

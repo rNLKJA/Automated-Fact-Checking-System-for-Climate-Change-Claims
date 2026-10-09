@@ -136,11 +136,12 @@ export default function MethodsPage() {
                 imbalanced.
               </li>
               <li>
-                <Strong>Uncertainty.</Strong> Every result carries a 95% interval. Proportions use
-                the Wilson score interval. Means, F1 and the harmonic mean use a percentile
-                bootstrap that resamples whole claims ({int(BASELINE_BOOTSTRAP.resamples)}{" "}
-                resamples, seed {BASELINE_BOOTSTRAP.seed}), so a claim&rsquo;s retrieval and verdict
-                move together.
+                <Strong>Uncertainty.</Strong> Every performance estimate carries a 95% interval.
+                Numbers quoted only to show that the re-run matches the 2024 report are given as
+                reported. Proportions use the Wilson score interval. Means, F1 and the harmonic mean
+                use a percentile bootstrap that resamples whole claims (
+                {int(BASELINE_BOOTSTRAP.resamples)} resamples, seed {BASELINE_BOOTSTRAP.seed}), so a
+                claim&rsquo;s retrieval and verdict move together.
               </li>
               <li>
                 <Strong>Comparisons are paired.</Strong> Two systems are compared on the same
@@ -171,9 +172,14 @@ export default function MethodsPage() {
                 {HARNESS_DEFAULTS.n}, seed {HARNESS_DEFAULTS.seed}) goes to the visitor&rsquo;s
                 model with the same retrieved passages the classifier read, and again with the gold
                 passages. Calls that fail for infrastructure reasons are excluded and counted.
-                Unusable answers are scored as wrong. Citation validity is the share of answers
-                whose cited ids were all among the passages shown. Its bootstrap uses{" "}
-                {int(HARNESS_BOOTSTRAP.resamples)} resamples, seed {HARNESS_BOOTSTRAP.seed}.
+                Unusable answers are scored as wrong. Macro-F1 averages both systems over one label
+                set: the labels in the gold set or in either system&rsquo;s verdicts, re-derived on
+                each resample. Citation validity is the share of answers whose cited ids were all
+                among the passages shown. In evidence F, cited ids that were not among the passages
+                shown count as wrong predictions. The classifier&rsquo;s gold-evidence verdicts come
+                from the epoch chosen on the same dev claims, so the gold condition flatters it. Its
+                bootstrap uses {int(HARNESS_BOOTSTRAP.resamples)} resamples, seed{" "}
+                {HARNESS_BOOTSTRAP.seed}.
               </li>
             </ul>
             <p>
@@ -305,15 +311,17 @@ export default function MethodsPage() {
             </Sub>
             <Sub title="Human in the loop and audit trail">
               <p>
-                Every call, including failed ones, is recorded in the{" "}
+                Every call, including failed ones and calls you stop while they are in flight, is
+                recorded in the{" "}
                 <Link href="/ai-log" className="text-foreground underline">
                   AI audit log
                 </Link>{" "}
-                in your browser. A record holds the prompt, the output, the model, the latency, the
-                token usage the provider reported and your decision on the output: accepted, edited
-                or rejected. You can export it as JSON or CSV and clear it at any time. Answers are
-                checked against a schema, and cited passage ids are checked against the passages the
-                model was shown.
+                in your browser. A record holds the prompt, the output, the model requested and the
+                model id the provider reported, the latency, the token usage the provider reported,
+                any retries after a rate limit or overload, and your decision on the output:
+                accepted, edited or rejected. You can export it as JSON or CSV and clear it at any
+                time. Answers are checked against a schema, and cited passage ids are checked
+                against the passages the model was shown.
               </p>
             </Sub>
             <p>
@@ -360,7 +368,9 @@ export default function MethodsPage() {
                     className="group block rounded-xl border border-border bg-card p-5 transition-colors hover:border-foreground/30"
                   >
                     <p className="font-mono text-xs text-muted-foreground">
-                      {d.id} · {d.decided} · {d.status}
+                      {d.id} · decided {d.decided}
+                      {d.recorded && d.recorded !== d.decided && ` · recorded ${d.recorded}`} ·{" "}
+                      {d.status}
                     </p>
                     <p className="mt-1 font-serif text-xl font-medium text-foreground">{d.title}</p>
                     <p className="mt-1 text-sm leading-relaxed text-muted-foreground">

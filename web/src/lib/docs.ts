@@ -4,6 +4,8 @@
  * the file reading lives in `src/server/docs.ts`.
  */
 
+import { SITE } from "./site";
+
 export type DecisionRecord = {
   /** "dr-001-tfidf-retrieval-over-dense-retrieval" */
   slug: string;
@@ -16,6 +18,8 @@ export type DecisionRecord = {
   decision: string;
   status: string;
   decided: string;
+  /** when the record was written (later than `decided` for records made in hindsight) */
+  recorded: string;
   /** markdown after the H1 */
   body: string;
 };
@@ -67,15 +71,17 @@ export function parseDecisionRecord(file: string, markdown: string): DecisionRec
     decision: stripMarkdown(decisionLine[1]),
     status: meta.Status ?? "",
     decided: meta.Decided ?? "",
+    recorded: meta.Recorded ?? "",
     body,
   };
 }
 
 /**
- * Map a link written for GitHub (relative .md paths) onto the site's routes.
- * External and absolute links are returned unchanged.
+ * Map a link written for GitHub (relative .md paths, or a full URL on the
+ * production site) onto the site's routes. Other links are returned unchanged.
  */
 export function resolveDocHref(href: string): string {
+  if (href.startsWith(`${SITE.url}/`)) return href.slice(SITE.url.length);
   if (/^[a-z]+:/i.test(href) || href.startsWith("/") || href.startsWith("#")) return href;
   const [path, hash] = href.split("#");
   const file = path.split("/").pop() ?? "";

@@ -1384,6 +1384,41 @@
    "lower": 0.16978169856459333,
    "upper": 0.45927220575318395,
    "se": 0.07551884346976273
+  },
+  "macro_f1_shared": {
+   "gold": [
+    "SUPPORTS",
+    "SUPPORTS",
+    "NOT_ENOUGH_INFO",
+    "REFUTES"
+   ],
+   "pred_a": [
+    "SUPPORTS",
+    "SUPPORTS",
+    "NOT_ENOUGH_INFO",
+    "DISPUTED"
+   ],
+   "pred_b": [
+    "SUPPORTS",
+    "SUPPORTS",
+    "NOT_ENOUGH_INFO",
+    "SUPPORTS"
+   ],
+   "labels": [
+    "DISPUTED",
+    "NOT_ENOUGH_INFO",
+    "REFUTES",
+    "SUPPORTS"
+   ],
+   "macro_f1_a": 0.5,
+   "macro_f1_b": 0.45,
+   "macro_f1_b_own_labels": 0.6,
+   "resamples": 500,
+   "seed": 13,
+   "estimate": 0.04999999999999999,
+   "lower": 0.0,
+   "upper": 0.19999999999999998,
+   "se": 0.05240773940319674
   }
  },
  "baseline": {

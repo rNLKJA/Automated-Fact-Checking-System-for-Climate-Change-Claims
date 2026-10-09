@@ -8,7 +8,9 @@ import {
   rowsFor,
   runToRows,
   sampleClaims,
+  sampleMatchesSeed,
   summarizeCondition,
+  verifyRun,
   type HarnessClaimSummary,
   type HarnessRow,
   type HarnessRun,
@@ -95,12 +97,41 @@ describe("summarizeCondition", () => {
     expect(s.citations).toMatchObject({ answers: 4, citing: 3, idsCited: 4, idsInvalid: 1 });
     expect(s.citations.allValid.successes).toBe(2);
     expect(s.citations.allValid.n).toBe(3);
-    // LLM cited e1 (gold) twice, e2 once, nothing once; classifier "relies on" both shown passages
-    expect(s.evidence.llm.estimate).toBeCloseTo((1 + 1 + 0 + 0) / 4, 15);
+    // LLM cited e1 (gold); e1 plus e9, never shown, which counts as a wrong
+    // prediction (F = 2/3); nothing; e2. The classifier "relies on" both shown passages.
+    const llmF = (1 + 2 / 3 + 0 + 0) / 4;
+    expect(s.evidence.llm.estimate).toBeCloseTo(llmF, 15);
     expect(s.evidence.classifier.estimate).toBeCloseTo(2 / 3, 15);
-    expect(s.harmonicMean?.llm.estimate).toBeCloseTo((2 * 0.5 * 0.75) / 1.25, 15);
+    expect(s.harmonicMean?.llm.estimate).toBeCloseTo((2 * llmF * 0.75) / (llmF + 0.75), 15);
     expect(s.latencyMs?.median).toBe(900);
     expect(s.tokens).toEqual({ input: 3200, output: 200, calls: 4 });
+  });
+
+  it("averages both systems' macro-F1 over one shared label set", () => {
+    // both 3 of 4 right; the LLM's "disputed" (absent from gold) must count against
+    // the classifier's average too: 0.50 vs 0.45 (sklearn), not 0.50 vs 0.60
+    const rows = [
+      row("SUPPORTS", "SUPPORTS", ok("SUPPORTS", ["e1"])),
+      row("SUPPORTS", "SUPPORTS", ok("SUPPORTS", ["e1"])),
+      row("NOT_ENOUGH_INFO", "NOT_ENOUGH_INFO", ok("NOT_ENOUGH_INFO", [])),
+      row("REFUTES", "SUPPORTS", ok("DISPUTED", ["e1"])),
+    ];
+    const s = summarizeCondition("retrieved", rows, { resamples: 300, seed: 3 });
+    expect(s).not.toBeNull();
+    if (!s) return;
+    expect(s.llm.labels).toEqual(s.classifier.labels);
+    expect(s.llm.macroF1.estimate).toBeCloseTo(0.5, 15);
+    expect(s.classifier.macroF1.estimate).toBeCloseTo(0.45, 15);
+    expect(s.comparison.macroF1Difference.estimate).toBeCloseTo(0.05, 15);
+  });
+
+  it("re-derives citation validity from the cited ids, not the stored lists", () => {
+    // a row whose stored lists claim the unseen id e9 was valid
+    const tampered = row("SUPPORTS", "SUPPORTS", ok("SUPPORTS", ["e1", "e9"], ["e1", "e9"]));
+    const s = summarizeCondition("retrieved", [tampered], { resamples: 50 });
+    expect(s?.citations).toMatchObject({ citing: 1, idsCited: 2, idsInvalid: 1 });
+    expect(s?.citations.allValid.successes).toBe(0);
+    expect(s?.evidence.llm.estimate).toBeCloseTo(2 / 3, 15);
   });
 
   it("excludes infrastructure failures and counts unusable answers as wrong", () => {
@@ -173,5 +204,34 @@ describe("runs", () => {
     expect(flat[1]).toMatchObject({ llm_status: "error", llm_correct: null });
     expect(parseRun(JSON.parse(JSON.stringify(run)))).toEqual(run);
     expect(() => parseRun({ ...run, format: "other" })).toThrow();
+    expect(flat[0]).toMatchObject({ sample_matches_seed: true });
+  });
+
+  it("flags a loaded run whose claims are not the seeded sample", () => {
+    expect(sampleMatchesSeed(run, claims)).toBe(true);
+    const picked = { ...run, claimIds: [sample[0].id, sample[1].id, claims[0].id] };
+    expect(sampleMatchesSeed(picked, claims)).toBe(claims[0].id === sample[2].id);
+    expect(sampleMatchesSeed({ ...run, seed: 8 }, claims)).toBe(false);
+    expect(sampleMatchesSeed({ ...run, n: 2 }, claims)).toBe(false);
+    expect(verifyRun({ ...run, seed: 8 }, byId).sampleMatchesSeed).toBe(false);
+  });
+
+  it("re-derives citation checks when a run is loaded", () => {
+    const shown = sample[0].retrievedIds[0];
+    const edited: HarnessRun = {
+      ...run,
+      outcomes: {
+        ...run.outcomes,
+        [sample[0].id]: {
+          ...run.outcomes[sample[0].id],
+          retrieved: ok(sample[0].label, [shown, "evidence-0"], [shown, "evidence-0"]),
+        },
+      },
+    };
+    const checked = verifyRun(edited, byId);
+    expect(checked.citationsCorrected).toBe(1);
+    const o = checked.run.outcomes[sample[0].id]?.retrieved;
+    expect(o?.status === "ok" && o.invalid).toEqual(["evidence-0"]);
+    expect(verifyRun(run, byId)).toMatchObject({ citationsCorrected: 0, sampleMatchesSeed: true });
   });
 });

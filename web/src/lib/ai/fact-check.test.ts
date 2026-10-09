@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { createMemoryAuditStore } from "./audit-log";
+import { createMemoryAuditStore, substitutedModel } from "./audit-log";
 import {
   buildFactCheckPrompt,
   checkCitations,
@@ -89,8 +89,11 @@ describe("runFactCheck", () => {
       feature: "llm-eval",
       provider: "anthropic",
       model: "claude-haiku-4-5",
+      served_model: "claude-haiku-4-5",
       decision: "pending",
       usage: { input_tokens: 812, output_tokens: 64 },
+      attempts: 1,
+      retries: [],
       error: null,
     });
     expect(entry.input.meta).toEqual({
@@ -139,7 +142,74 @@ describe("runFactCheck", () => {
     expect(entry.latency_ms).toBeNull();
   });
 
-  it("works with OpenAI and rethrows a user abort without logging it", async () => {
+  it("counts retries in the call's record", async () => {
+    const store = createMemoryAuditStore();
+    const answer = { label: "REFUTES", evidence_ids: ["evidence-2"], rationale: "r" };
+    const { impl, calls } = mockFetch([
+      jsonResponse(429, { error: { type: "rate_limit_error" } }),
+      jsonResponse(529, { error: { type: "overloaded_error" } }),
+      jsonResponse(200, anthropicMessage(JSON.stringify(answer))),
+    ]);
+    const r = await runFactCheck({
+      settings,
+      claim,
+      passages,
+      feature: "llm-eval",
+      store,
+      fetchImpl: impl,
+      sleep: noSleep,
+    });
+    expect(r.status).toBe("ok");
+    expect(calls).toHaveLength(3);
+    const [entry] = await store.list();
+    expect(entry.attempts).toBe(3);
+    expect(entry.retries).toEqual([
+      { kind: "rate_limit", status: 429 },
+      { kind: "overloaded", status: 529 },
+    ]);
+  });
+
+  it("logs a call stopped in flight, but not one stopped before it was sent", async () => {
+    const store = createMemoryAuditStore();
+    const controller = new AbortController();
+    const inFlight = (async () => {
+      controller.abort();
+      throw new DOMException("aborted", "AbortError");
+    }) as typeof fetch;
+    await expect(
+      runFactCheck({
+        settings,
+        claim,
+        passages,
+        feature: "llm-eval",
+        store,
+        fetchImpl: inFlight,
+        signal: controller.signal,
+      }),
+    ).rejects.toMatchObject({ kind: "aborted" });
+    const [entry] = await store.list();
+    expect(entry.error?.kind).toBe("aborted");
+    expect(entry.error?.message).toContain("may still process and bill it");
+    expect(entry).toMatchObject({ output: null, attempts: 1 });
+    expect(JSON.stringify(entry)).not.toContain(KEY);
+
+    const before = mockFetch([jsonResponse(200, anthropicMessage("{}"))]);
+    await expect(
+      runFactCheck({
+        settings,
+        claim,
+        passages,
+        feature: "llm-eval",
+        store,
+        fetchImpl: before.impl,
+        signal: controller.signal,
+      }),
+    ).rejects.toMatchObject({ kind: "aborted" });
+    expect(before.calls).toHaveLength(0);
+    expect(await store.list()).toHaveLength(1);
+  });
+
+  it("works with OpenAI and does not log a call stopped before it was sent", async () => {
     const store = createMemoryAuditStore();
     const openai: AiSettings = {
       ...DEFAULT_SETTINGS,
@@ -158,6 +228,10 @@ describe("runFactCheck", () => {
     });
     expect(r).toMatchObject({ status: "ok", label: "NOT_ENOUGH_INFO", cited: [] });
     expect(ok.calls[0].body.model).toBe("gpt-5-mini");
+    const [logged] = await store.list();
+    // the requested id and the dated snapshot the provider reports are kept apart
+    expect(logged).toMatchObject({ model: "gpt-5-mini", served_model: "gpt-5-mini-2025-08-07" });
+    expect(substitutedModel(logged.model, logged.served_model)).toBeNull();
 
     const controller = new AbortController();
     controller.abort();

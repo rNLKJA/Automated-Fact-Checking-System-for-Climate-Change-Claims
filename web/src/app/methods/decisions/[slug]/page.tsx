@@ -42,7 +42,8 @@ export default async function DecisionPage({ params }: PageProps<"/methods/decis
             <ArrowLeft aria-hidden className="size-4" /> All decision records
           </Link>
           <Eyebrow>
-            Decision record {d.id} · {d.decided}
+            Decision record {d.id} · decided {d.decided}
+            {d.recorded && d.recorded !== d.decided && ` · recorded ${d.recorded}`}
           </Eyebrow>
           <h1 className="text-headline font-medium md:text-[2.5rem] md:leading-[1.1]">{d.title}</h1>
         </div>

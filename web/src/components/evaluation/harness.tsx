@@ -34,7 +34,9 @@ import {
   RUN_CSV_COLUMNS,
   runToRows,
   sampleClaims,
+  sampleMatchesSeed,
   summarizeCondition,
+  verifyRun,
   type Condition,
   type ConditionSummary,
   type HarnessClaim,
@@ -127,6 +129,8 @@ export function LlmHarness({ claims }: { claims: HarnessClaimSummary[] }) {
   const fileRef = useRef<HTMLInputElement>(null);
 
   const byId = useMemo(() => new Map(claims.map((c) => [c.id, c])), [claims]);
+  // a loaded file may list claims other than the seeded sample its header names
+  const seeded = useMemo(() => (run ? sampleMatchesSeed(run, claims) : true), [run, claims]);
   const n = clampN(Number(nText));
   const seed = Number.isInteger(Number(seedText)) ? Number(seedText) : HARNESS_DEFAULTS.seed;
   const sample = useMemo(() => sampleClaims(claims, n, seed), [claims, n, seed]);
@@ -279,6 +283,9 @@ export function LlmHarness({ claims }: { claims: HarnessClaimSummary[] }) {
     const payload = {
       ...run,
       note: "LLM outputs in this file are AI-generated. Classifier verdicts are the retrained 2024 model's stored predictions.",
+      sample: seeded
+        ? `seeded random sample: ${run.n} dev claims drawn with seed ${run.seed}`
+        : `custom sample: these claim ids are not the ${run.n} claims drawn with seed ${run.seed}`,
       bootstrap: HARNESS_BOOTSTRAP,
       summary: Object.fromEntries(
         Object.entries(summary).map(([c, s]) => [
@@ -325,10 +332,16 @@ export function LlmHarness({ claims }: { claims: HarnessClaimSummary[] }) {
       const unknown = parsed.claimIds.filter((c) => !byId.has(c));
       if (unknown.length > 0)
         throw new Error(`unknown claim ids: ${unknown.slice(0, 3).join(", ")}`);
-      setRun(parsed);
+      // citation checks are re-derived from the cited ids, never taken from the file
+      const checked = verifyRun(parsed, byId);
+      setRun(checked.run);
       setImported(true);
       setStatus("done");
-      setNotice(null);
+      setNotice(
+        checked.citationsCorrected > 0
+          ? `Loaded, but ${checked.citationsCorrected} saved citation ${checked.citationsCorrected === 1 ? "check did" : "checks did"} not match the passages shown, so ${checked.citationsCorrected === 1 ? "it was" : "they were"} recomputed from the cited ids.`
+          : null,
+      );
     } catch (err) {
       setNotice(
         `That file is not a run exported from this page (${err instanceof Error ? err.message.slice(0, 160) : "unreadable"}).`,
@@ -498,7 +511,14 @@ export function LlmHarness({ claims }: { claims: HarnessClaimSummary[] }) {
               <span>
                 {imported ? "Loaded from file: " : ""}
                 {PROVIDERS[run.provider as "anthropic" | "openai"]?.label ?? run.provider} ·{" "}
-                <span className="font-mono">{run.model}</span> · N = {run.n}, seed {run.seed}
+                <span className="font-mono">{run.model}</span> ·{" "}
+                {seeded ? (
+                  `N = ${run.n}, seed ${run.seed}`
+                ) : (
+                  <span className="font-medium text-destructive">
+                    custom sample of {run.claimIds.length} claims (not the seed-{run.seed} sample)
+                  </span>
+                )}
               </span>
               <span className="tabular">
                 {status === "running"
@@ -563,16 +583,23 @@ export function LlmHarness({ claims }: { claims: HarnessClaimSummary[] }) {
       {/* --------------------------------------------------------- claim table */}
       <section aria-labelledby={`${id}-claims`} className="space-y-3">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <h2 id={`${id}-claims`} className="font-serif text-2xl font-medium">
-            {run ? "Claim by claim" : `The sample: ${sample.length} claims`}
-          </h2>
+          <div className="flex flex-wrap items-center gap-3">
+            <h2 id={`${id}-claims`} className="font-serif text-2xl font-medium">
+              {run ? "Claim by claim" : `The sample: ${sample.length} claims`}
+            </h2>
+            {run && <AiGeneratedBadge model={run.model} />}
+          </div>
           <p className="text-xs text-muted-foreground">
-            ✓ right · ✗ wrong · every LLM call is in the{" "}
+            ✓ right · ✗ wrong · LLM verdicts and rationales are AI-generated · every LLM call is in
+            the{" "}
             <Link href="/ai-log" className="text-foreground underline underline-offset-4">
               AI audit log
             </Link>
           </p>
         </div>
+        <p className="text-xs text-muted-foreground sm:hidden">
+          Scroll the table sideways for the verdicts →
+        </p>
         <ClaimTable
           ids={shownIds}
           conditions={shownConds}
@@ -695,7 +722,7 @@ function ConditionCard({
         scale={[0, 1, "0%", "100%"]}
       />
       <Pair
-        label="Macro-F1 (bootstrap 95% CI)"
+        label="Macro-F1, one shared label set (bootstrap 95% CI)"
         llm={{
           ...s.llm.macroF1,
           text: `${fixed(s.llm.macroF1.estimate, 2)} ${range(s.llm.macroF1.lower, s.llm.macroF1.upper, "fixed", 2)}`,
@@ -710,7 +737,7 @@ function ConditionCard({
       <dl className="grid grid-cols-2 gap-x-4 gap-y-4 border-t border-border pt-4 text-sm">
         <div className="col-span-2">
           <dt className="text-xs text-muted-foreground">LLM − classifier accuracy (paired)</dt>
-          <dd className="font-mono tabular">
+          <dd className="font-mono whitespace-nowrap tabular">
             {pp(c.difference.estimate)}{" "}
             <span className="text-muted-foreground">
               {range(c.difference.lower, c.difference.upper, "pp")}
@@ -739,7 +766,7 @@ function ConditionCard({
         </div>
         <div>
           <dt className="text-xs text-muted-foreground">Evidence F vs gold</dt>
-          <dd className="font-mono tabular">
+          <dd className="font-mono whitespace-nowrap tabular">
             LLM {fixed(s.evidence.llm.estimate, 2)}{" "}
             <span className="text-muted-foreground">
               {range(s.evidence.llm.lower, s.evidence.llm.upper, "fixed", 2)}
@@ -757,13 +784,17 @@ function ConditionCard({
               Course metric: harmonic mean of evidence F and accuracy
             </dt>
             <dd className="font-mono tabular">
-              LLM {fixed(s.harmonicMean.llm.estimate)}{" "}
-              <span className="text-muted-foreground">
-                {range(s.harmonicMean.llm.lower, s.harmonicMean.llm.upper, "fixed")}
+              <span className="whitespace-nowrap">
+                LLM {fixed(s.harmonicMean.llm.estimate)}{" "}
+                <span className="text-muted-foreground">
+                  {range(s.harmonicMean.llm.lower, s.harmonicMean.llm.upper, "fixed")}
+                </span>
               </span>{" "}
-              · 2024 system {fixed(s.harmonicMean.classifier.estimate)}{" "}
-              <span className="text-muted-foreground">
-                {range(s.harmonicMean.classifier.lower, s.harmonicMean.classifier.upper, "fixed")}
+              <span className="whitespace-nowrap">
+                · 2024 system {fixed(s.harmonicMean.classifier.estimate)}{" "}
+                <span className="text-muted-foreground">
+                  {range(s.harmonicMean.classifier.lower, s.harmonicMean.classifier.upper, "fixed")}
+                </span>
               </span>
             </dd>
           </div>
@@ -866,7 +897,7 @@ function ClaimTable({
       aria-label="Claims in the sample"
       tabIndex={0}
     >
-      <table className="w-full min-w-[46rem] text-left text-sm">
+      <table className="w-full min-w-[40rem] text-left text-sm sm:min-w-[46rem]">
         <caption className="sr-only">
           Each sampled claim with its gold label, the classifier verdict and the LLM verdict for
           each evidence condition
@@ -882,7 +913,7 @@ function ClaimTable({
             {conditions.map((c) => (
               <th key={c} scope="col" colSpan={2} className="px-3 py-3 font-medium">
                 {CONDITIONS[c].short}
-                <span className="block font-normal">classifier · LLM</span>
+                <span className="block font-normal">classifier · LLM (AI-generated)</span>
               </th>
             ))}
           </tr>
@@ -893,7 +924,10 @@ function ClaimTable({
             if (!c) return null;
             return (
               <tr key={cid} className="align-top">
-                <th scope="row" className="max-w-[22rem] px-4 py-3 font-normal">
+                <th
+                  scope="row"
+                  className="max-w-[12rem] min-w-[10rem] px-4 py-3 font-normal sm:max-w-[22rem]"
+                >
                   <Link
                     href={`/explore/${cid}`}
                     className="font-mono text-xs text-muted-foreground underline-offset-4 hover:underline"
@@ -901,7 +935,7 @@ function ClaimTable({
                   >
                     claim {claimNumber(cid)}
                   </Link>
-                  <span className="mt-0.5 line-clamp-3 block leading-snug">{c.text}</span>
+                  <span className="mt-0.5 line-clamp-3 leading-snug">{c.text}</span>
                 </th>
                 <td className="px-3 py-3">
                   <VerdictBadge label={c.label} size="sm" />

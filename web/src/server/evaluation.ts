@@ -4,7 +4,12 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 
 import { buildFactCheckPrompt } from "@/lib/ai/fact-check";
-import { baselineReport, type BaselineReport, type BaselineRow } from "@/lib/evaluation/baseline";
+import {
+  BASELINE_BOOTSTRAP,
+  baselineReport,
+  type BaselineReport,
+  type BaselineRow,
+} from "@/lib/evaluation/baseline";
 import type { HarnessClaim, HarnessClaimSummary } from "@/lib/evaluation/harness";
 import {
   summarizeSeedSpread,
@@ -12,6 +17,7 @@ import {
   type SeedSpreadFile,
 } from "@/lib/evaluation/seed-spread";
 import type { Label } from "@/lib/labels";
+import { comparePaired, type PairedComparison } from "@/lib/stats";
 import type { Protocol } from "@/lib/types";
 import { getDb } from "./db";
 
@@ -98,6 +104,25 @@ let report: BaselineReport | undefined;
 export function getBaselineReport(): BaselineReport {
   report ??= baselineReport(baselineRows());
   return report;
+}
+
+let singleVsMajority: PairedComparison | undefined;
+
+/**
+ * The one-claim-at-a-time protocol (how the Try-it page runs the model) against
+ * always answering "supports", paired over the 154 dev claims.
+ */
+export function getSingleVsMajority(): PairedComparison {
+  if (!singleVsMajority) {
+    const rows = baselineRows();
+    singleVsMajority = comparePaired(
+      rows.map((r) => r.label),
+      rows.map((r) => r.predictions.single),
+      rows.map((): Label => "SUPPORTS"),
+      BASELINE_BOOTSTRAP,
+    );
+  }
+  return singleVsMajority;
 }
 
 /** Everything the LLM harness needs for every dev claim, evidence text included. */

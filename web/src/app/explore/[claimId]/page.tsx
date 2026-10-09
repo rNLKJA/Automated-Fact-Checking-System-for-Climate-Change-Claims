@@ -95,7 +95,6 @@ export default async function ClaimPage({ params }: PageProps<"/explore/[claimId
           claim={claim.text}
           claimId={claim.id}
           goldLabel={claim.label}
-          modelLabel={d.predictions.find((p) => p.protocol === "batch")?.label}
           options={[
             {
               key: "retrieved",
@@ -103,11 +102,14 @@ export default async function ClaimPage({ params }: PageProps<"/explore/[claimId
               passages: (d.runs.find((r) => r.summary.run === "saved_2024")?.passages ?? []).map(
                 (p) => ({ id: p.id, text: p.text }),
               ),
+              // the notebook protocol reads exactly this saved 2024 list
+              modelLabel: d.predictions.find((p) => p.protocol === "batch")?.label,
             },
             {
               key: "gold",
               label: "Gold",
               passages: d.gold.map((g) => ({ id: g.id, text: g.text })),
+              modelLabel: d.predictions.find((p) => p.protocol === "gold_evidence")?.label,
             },
           ]}
         />

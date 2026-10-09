@@ -18,7 +18,7 @@ This card describes the system the site runs: the 2024 team's TF-IDF evidence re
 ## Intended use
 
 - Teaching and portfolio use: showing how a 2024 student fact-checking system works, step by step, and how well it does.
-- Studying evaluation: the site reports every number with an interval and compares systems on the same claims.
+- Studying evaluation: the site reports every performance estimate with an interval and compares systems on the same claims.
 
 ## Out-of-scope uses
 
@@ -83,7 +83,7 @@ Training-seed spread. The site's model is one training run (seed 42). Retrained 
 
 ## Optional LLM features (not a trained model)
 
-Visitors can bring their own Anthropic or OpenAI key to ask an LLM for a second opinion on a claim, or to compare an LLM with this classifier on the same claims and evidence. The LLM is told to judge from the given passages only and to cite passage ids. Its outputs are labelled as AI-generated, validated against a schema, written to an audit log in the visitor's browser, and reviewed by the visitor (accept, edit or reject). The site ships no LLM results, because none have been run with a budget. See [DR-004](decisions/DR-004-byok-browser-only-llm-evaluation.md) and the AI use statement at `/methods#ai-use`.
+Visitors can bring their own Anthropic or OpenAI key to ask an LLM for a second opinion on a claim, or to compare an LLM with this classifier on the same claims and evidence. The LLM is told to judge from the given passages only and to cite passage ids. Its outputs are labelled as AI-generated, validated against a schema, written to an audit log in the visitor's browser, and reviewed by the visitor (accept, edit or reject). The site ships no LLM results, because none have been run with a budget. See [DR-004](decisions/DR-004-byok-browser-only-llm-evaluation.md) and the [AI use statement](https://comp90042-climate-fact-check.vercel.app/methods#ai-use).
 
 ## Reproducibility
 

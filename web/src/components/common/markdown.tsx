@@ -76,11 +76,19 @@ const components: Components = {
       {children}
     </th>
   ),
-  td: ({ children, style }) => (
-    <td className="px-4 py-2.5 align-top tabular" style={style}>
-      {children}
-    </td>
-  ),
+  td: ({ children, style }) => {
+    // keep short numeric cells ("−14.3 to +2.6 pp", "[0.020, 0.069]") on one line
+    const t = text(children);
+    const numeric = t.length <= 28 && /\d/.test(t);
+    return (
+      <td
+        className={cn("px-4 py-2.5 align-top tabular", numeric && "whitespace-nowrap")}
+        style={style}
+      >
+        {children}
+      </td>
+    );
+  },
 };
 
 /** Renders one of the repository's markdown documents in the site's editorial style. */

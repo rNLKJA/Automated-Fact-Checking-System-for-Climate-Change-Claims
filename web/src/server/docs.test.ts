@@ -44,6 +44,7 @@ describe("docs mirrored into web/content", () => {
       expect(r.decision.length, r.id).toBeGreaterThan(20);
       expect(r.status, r.id).not.toBe("");
       expect(r.decided, r.id).not.toBe("");
+      expect(r.recorded, r.id).not.toBe("");
       // the decision is stated first, before any section
       expect(r.body.indexOf("**Decision:**"), r.id).toBe(0);
       let at = -1;
@@ -93,6 +94,9 @@ describe("doc helpers", () => {
     );
     expect(resolveDocHref("https://example.org/x.md")).toBe("https://example.org/x.md");
     expect(resolveDocHref("/methods")).toBe("/methods");
+    expect(resolveDocHref("https://comp90042-climate-fact-check.vercel.app/methods#ai-use")).toBe(
+      "/methods#ai-use",
+    );
     expect(resolveDocHref("other.txt")).toBe("other.txt");
     expect(decisionSlug("DR-002-x.md")).toBe("dr-002-x");
     expect(headingId("What I'd change")).toBe("what-id-change");

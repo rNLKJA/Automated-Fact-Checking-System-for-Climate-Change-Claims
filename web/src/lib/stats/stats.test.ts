@@ -236,4 +236,24 @@ describe("summary bundles", () => {
     expect(c.mcnemar.c).toBe(0);
     expect(() => comparePaired(gold, gold, ["A"])).toThrow();
   });
+
+  it("averages two systems' macro-F1 over one shared label set (sklearn)", () => {
+    const s = u.macro_f1_shared;
+    // alone, B is averaged over its own labels only (sklearn's default)
+    close(
+      evaluateLabels(s.gold, s.pred_b, { resamples: 10 }).macroF1.estimate,
+      s.macro_f1_b_own_labels,
+    );
+    const a = evaluateLabels(s.gold, s.pred_a, { resamples: 10, sharedWith: s.pred_b });
+    const b = evaluateLabels(s.gold, s.pred_b, { resamples: 10, sharedWith: s.pred_a });
+    expect(a.labels).toEqual(s.labels);
+    expect(b.labels).toEqual(s.labels);
+    close(a.macroF1.estimate, s.macro_f1_a);
+    close(b.macroF1.estimate, s.macro_f1_b);
+    const c = comparePaired(s.gold, s.pred_a, s.pred_b, { resamples: s.resamples, seed: s.seed });
+    close(c.macroF1Difference.estimate, s.estimate);
+    close(c.macroF1Difference.lower, s.lower);
+    close(c.macroF1Difference.upper, s.upper);
+    expect(() => evaluateLabels(s.gold, s.pred_a, { sharedWith: ["A"] })).toThrow();
+  });
 });

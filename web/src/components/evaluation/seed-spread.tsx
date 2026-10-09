@@ -185,17 +185,17 @@ export function SeedSpreadCard({ s, majority }: { s: SeedSpread; majority: numbe
                 Mean (SD)
               </th>
               <td />
-              <td className="px-3 py-2 text-right font-mono">
+              <td className="px-3 py-2 text-right font-mono whitespace-nowrap">
                 {pct(t.gold.mean)} ({pp(t.gold.sd).replace("+", "")})
               </td>
-              <td className="px-3 py-2 text-right font-mono">
+              <td className="px-3 py-2 text-right font-mono whitespace-nowrap">
                 {pct(t.retrieved.mean)} ({pp(t.retrieved.sd).replace("+", "")})
               </td>
               <td />
-              <td className="px-3 py-2 text-right font-mono">
+              <td className="px-3 py-2 text-right font-mono whitespace-nowrap">
                 {pct(l.gold.mean)} ({pp(l.gold.sd).replace("+", "")})
               </td>
-              <td className="px-3 py-2 text-right font-mono">
+              <td className="px-3 py-2 text-right font-mono whitespace-nowrap">
                 {pct(l.retrieved.mean)} ({pp(l.retrieved.sd).replace("+", "")})
               </td>
             </tr>

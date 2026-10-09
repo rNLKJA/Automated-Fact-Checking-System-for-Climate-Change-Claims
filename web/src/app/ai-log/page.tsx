@@ -15,10 +15,11 @@ export default function AiLogPage() {
   return (
     <>
       <PageHeader eyebrow="Transparency" title="AI audit log">
-        One record per model call made from this browser: the prompt that was sent, the answer that
-        came back, how long it took, the tokens the provider reported and your review (accepted,
-        edited or rejected). It lives only in this browser&rsquo;s storage (IndexedDB). It is never
-        sent to this site, and it never contains your API key.
+        One record per model call made from this browser, including failed calls and calls you
+        stopped: the prompt that was sent, the answer that came back, how long it took, the tokens
+        the provider reported, any retries after a rate limit, and your review (accepted, edited or
+        rejected). It lives only in this browser&rsquo;s storage (IndexedDB). It is never sent to
+        this site, and it never contains your API key.
       </PageHeader>
       <div className="mx-auto max-w-6xl space-y-6 px-4 py-10 sm:px-6">
         <AuditLogView />

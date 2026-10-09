@@ -21,7 +21,10 @@ export type LabelEvaluation = {
   correct: number;
   accuracy: ProportionInterval;
   accuracyBootstrap: BootstrapInterval;
-  /** sklearn macro-F1 over the labels present in gold or predictions (re-derived per resample) */
+  /**
+   * sklearn macro-F1 over the labels present in gold or predictions (plus those of
+   * `sharedWith`, if given), re-derived on every resample
+   */
   macroF1: BootstrapInterval;
   labels: string[];
   perClass: ClassMetrics[];
@@ -36,16 +39,39 @@ export type LabelOptions = BootstrapOptions & {
    * it still counts as a miss for accuracy and recall.
    */
   labelSpace?: readonly string[];
+  /**
+   * Another system's predictions on the same items (same order). Its labels join
+   * the macro-F1 label set, resampled with the same indices, so that two systems
+   * compared side by side are averaged over one shared set of labels. Without
+   * it, a label only one system predicts (absent from gold) adds a zero-F1 class
+   * to that system's average alone.
+   */
+  sharedWith?: readonly string[];
 };
 
-/** sklearn's default label set (present in gold or predictions), optionally restricted. */
-function labelsIn(gold: readonly string[], pred: readonly string[], space?: readonly string[]) {
-  const present = presentLabels(gold, pred);
+/**
+ * sklearn's default label set (present in gold or predictions), widened by any
+ * other systems' predictions and optionally restricted to `space`.
+ */
+function labelsIn(
+  gold: readonly string[],
+  pred: readonly string[],
+  space?: readonly string[],
+  others: readonly (readonly string[])[] = [],
+) {
+  const present = others.length
+    ? [...new Set([...gold, ...pred, ...others.flat()])].sort()
+    : presentLabels(gold, pred);
   return space ? present.filter((l) => space.includes(l)) : present;
 }
 
-function macroF1In(gold: readonly string[], pred: readonly string[], space?: readonly string[]) {
-  return macroF1(gold, pred, labelsIn(gold, pred, space));
+function macroF1In(
+  gold: readonly string[],
+  pred: readonly string[],
+  space?: readonly string[],
+  others: readonly (readonly string[])[] = [],
+) {
+  return macroF1(gold, pred, labelsIn(gold, pred, space, others));
 }
 
 export function evaluateLabels(
@@ -55,7 +81,9 @@ export function evaluateLabels(
 ): LabelEvaluation {
   if (gold.length !== pred.length) throw new Error("gold and predictions differ in length");
   const space = options.labelSpace;
-  const labels = labelsIn(gold, pred, space);
+  const shared = options.sharedWith;
+  if (shared && shared.length !== gold.length) throw new Error("sharedWith differs in length");
+  const labels = labelsIn(gold, pred, space, shared ? [shared] : []);
   const correct = gold.reduce((k, g, i) => k + (g === pred[i] ? 1 : 0), 0);
   return {
     n: gold.length,
@@ -68,7 +96,7 @@ export function evaluateLabels(
     ),
     macroF1: bootstrap(
       gold.length,
-      (idx) => macroF1In(at(gold, idx), at(pred, idx), space),
+      (idx) => macroF1In(at(gold, idx), at(pred, idx), space, shared ? [at(shared, idx)] : []),
       options,
     ),
     labels,
@@ -83,7 +111,10 @@ export type PairedComparison = {
   accuracyB: number;
   /** accuracy(A) − accuracy(B), paired bootstrap over items */
   difference: BootstrapInterval;
-  /** macro-F1(A) − macro-F1(B), paired bootstrap over items */
+  /**
+   * macro-F1(A) − macro-F1(B), paired bootstrap over items. On each resample both
+   * systems are averaged over one label set: the labels in gold, A or B there.
+   */
   macroF1Difference: BootstrapInterval;
   mcnemar: McNemarResult;
   /** Cohen's h of accuracy A vs accuracy B (descriptive) */
@@ -121,7 +152,9 @@ export function comparePaired(
       n,
       (idx) => {
         const g = at(gold, idx);
-        return macroF1In(g, at(predA, idx), space) - macroF1In(g, at(predB, idx), space);
+        const a = at(predA, idx);
+        const b = at(predB, idx);
+        return macroF1In(g, a, space, [b]) - macroF1In(g, b, space, [a]);
       },
       options,
     ),

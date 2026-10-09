@@ -106,8 +106,13 @@ def wilson(k: int, n: int) -> dict:
     return {"k": k, "n": n, "estimate": k / n, "lower": float(lo), "upper": float(hi)}
 
 
-def macro_f1(gold, pred) -> float:
-    return float(f1_score(gold, pred, average="macro", zero_division=0))
+def macro_f1(gold, pred, labels=None) -> float:
+    return float(f1_score(gold, pred, labels=labels, average="macro", zero_division=0))
+
+
+def shared_labels(*label_lists) -> list[str]:
+    """The labels in gold or either system's predictions: one macro-F1 label set for a pair."""
+    return sorted(set().union(*(set(x) for x in label_lists)))
 
 
 # ----------------------------------------------------------------- unit fixtures
@@ -235,6 +240,31 @@ def unit_fixtures() -> dict:
         "seed": 7,
         **boot(vals, macro_f1(g, pr)),
     }
+
+    # two systems on one shared macro-F1 label set (a label only system A predicts
+    # must count against B's average too), with a paired bootstrap of the difference
+    g = ["SUPPORTS", "SUPPORTS", "NOT_ENOUGH_INFO", "REFUTES"]
+    a = ["SUPPORTS", "SUPPORTS", "NOT_ENOUGH_INFO", "DISPUTED"]
+    b = ["SUPPORTS", "SUPPORTS", "NOT_ENOUGH_INFO", "SUPPORTS"]
+    labels = shared_labels(g, a, b)
+    rows = resample_indices(len(g), 500, 13)
+    diffs = []
+    for row in rows:
+        gg, aa, bb = ([x[i] for i in row] for x in (g, a, b))
+        lab = shared_labels(gg, aa, bb)
+        diffs.append(macro_f1(gg, aa, lab) - macro_f1(gg, bb, lab))
+    out["macro_f1_shared"] = {
+        "gold": g,
+        "pred_a": a,
+        "pred_b": b,
+        "labels": labels,
+        "macro_f1_a": macro_f1(g, a, labels),
+        "macro_f1_b": macro_f1(g, b, labels),
+        "macro_f1_b_own_labels": macro_f1(g, b),
+        "resamples": 500,
+        "seed": 13,
+        **boot(np.array(diffs), macro_f1(g, a, labels) - macro_f1(g, b, labels)),
+    }
     return out
 
 
@@ -314,13 +344,17 @@ def baseline() -> dict:
         a, b = np.array(pred_a), np.array(pred_b)
         ok_a, ok_b = (g == a), (g == b)
         diffs = (ok_a.astype(float) - ok_b.astype(float))[idx].mean(axis=1)
-        f1d = np.array([macro_f1(g[row], a[row]) - macro_f1(g[row], b[row]) for row in idx])
+        def f1_gap(row) -> float:
+            lab = shared_labels(g[row], a[row], b[row])
+            return macro_f1(g[row], a[row], lab) - macro_f1(g[row], b[row], lab)
+
+        f1d = np.array([f1_gap(row) for row in idx])
         bb = int((ok_a & ~ok_b).sum())
         cc = int((~ok_a & ok_b).sum())
         table = [[int((ok_a & ok_b).sum()), bb], [cc, int((~ok_a & ~ok_b).sum())]]
         return {
             "difference": boot(diffs, ok_a.mean() - ok_b.mean()),
-            "macro_f1_difference": boot(f1d, macro_f1(g, a) - macro_f1(g, b)),
+            "macro_f1_difference": boot(f1d, f1_gap(np.arange(n))),
             "b": bb,
             "c": cc,
             "exact_p": float(mcnemar(table, exact=True).pvalue),

@@ -79,7 +79,7 @@ the filter, which points to 2024 logic that is not in the notebook.
 
 ### The same results with their uncertainty
 
-The 154 dev claims are a small sample, so every result on the site carries a 95% interval.
+The 154 dev claims are a small sample, so every performance estimate on the site carries a 95% interval.
 Proportions use the Wilson score interval; everything else uses a percentile bootstrap that
 resamples whole claims (10,000 resamples, seed 2026). The point estimates are the original
 values. `scripts/stats_reference.py` recomputes all of them with numpy, scikit-learn and
@@ -134,8 +134,13 @@ evidence?
 - **Paired statistics.** Accuracy and macro-F1 with intervals for both systems, the paired
   difference with a bootstrap interval, McNemar's exact test, Cohen's h, citation validity
   (cited ids must be among the passages shown), the course's harmonic mean, latency and tokens.
-  Calls that fail for infrastructure reasons are excluded and counted; unusable answers count as
-  wrong. Runs export as JSON or CSV and can be loaded back.
+  Macro-F1 averages both systems over one shared label set, and in evidence F a cited id the
+  model was never shown counts as a wrong prediction. Calls that fail for infrastructure reasons
+  are excluded and counted; unusable answers count as wrong. Runs export as JSON or CSV and can
+  be loaded back; a loaded run's citation checks are recomputed and a hand-picked sample is
+  flagged.
+- **A caveat for the gold condition.** The classifier's gold-evidence verdicts come from the
+  training epoch chosen on the same dev claims, so the gold condition flatters it.
 - **Cost note.** The page estimates the cost before you run it. Twenty claims under both
   conditions are 40 calls, a few cents with Claude Haiku 4.5. Twenty claims also give accuracy
   intervals about 40 points wide, and the page says so next to every result.
@@ -149,9 +154,10 @@ device", and "forget keys" deletes it. Requests go straight from your browser to
 to this site's server, never logged, never committed and never written to the audit log. The
 site ships no LLM results, because it has no budget for model calls.
 
-**The AI audit log.** Every call, including failed ones, is recorded in your browser
-(IndexedDB) with the prompt, the output, the model, latency, the token usage the provider
-reported and your decision on the output (accepted, edited or rejected). View it at
+**The AI audit log.** Every call, including failed ones and calls you stop in flight, is
+recorded in your browser (IndexedDB) with the prompt, the output, the model requested and the
+model id the provider reported, latency, the token usage the provider reported, any retries
+after a rate limit or overload, and your decision on the output (accepted, edited or rejected). View it at
 [`/ai-log`](https://comp90042-climate-fact-check.vercel.app/ai-log) (also linked in the
 footer and the mobile menu), export it as JSON or CSV, or clear it. Every AI output on the site
 is labelled "AI-generated". A second-opinion panel on each claim page and Try-it result uses the

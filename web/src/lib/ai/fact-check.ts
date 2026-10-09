@@ -12,9 +12,12 @@ import { z } from "zod";
 import { LABELS, type Label } from "../labels";
 import type { JsonSchema, Usage } from "./adapters";
 import { newAuditEntry, type AiFeature, type AuditEntry, type AuditStore } from "./audit-log";
+import { checkCitations, type CitationCheck } from "./citations";
 import { completeJson } from "./client";
 import { AiError, errorFromThrown } from "./errors";
 import { activeKey, activeModel, type AiSettings } from "./settings";
+
+export { checkCitations, type CitationCheck } from "./citations";
 
 export type Passage = { id: string; text: string };
 
@@ -82,30 +85,6 @@ Return the label, the ids of the passages you relied on and a short rationale.`;
   return { system: FACT_CHECK_SYSTEM, user };
 }
 
-export type CitationCheck = {
-  /** distinct cited ids that were among the provided passages */
-  valid: string[];
-  /** distinct cited ids that were not */
-  invalid: string[];
-};
-
-export function checkCitations(
-  cited: readonly string[],
-  provided: readonly string[],
-): CitationCheck {
-  const allowed = new Set(provided);
-  const seen = new Set<string>();
-  const valid: string[] = [];
-  const invalid: string[] = [];
-  for (const raw of cited) {
-    const id = raw.trim();
-    if (!id || seen.has(id)) continue;
-    seen.add(id);
-    (allowed.has(id) ? valid : invalid).push(id);
-  }
-  return { valid, invalid };
-}
-
 export type FactCheckResult =
   | {
       status: "ok";
@@ -149,14 +128,22 @@ export type FactCheckRequest = {
   sleep?: (ms: number, signal?: AbortSignal) => Promise<void>;
 };
 
+/** Logged for a call the visitor stopped while it was in flight. */
+export const ABORTED_MESSAGE =
+  "Stopped by you before the answer arrived. The request may already have reached the provider, which may still process and bill it.";
+
 /**
- * Run one fact-check and append it to the audit log, whatever the outcome
- * (an aborted call is the only one not logged: no answer was requested in full).
+ * Run one fact-check and append it to the audit log, whatever the outcome:
+ * answers, unusable answers, failures and calls stopped in flight. Only a call
+ * stopped before it started (nothing was sent) is not logged. Retries after a
+ * rate limit or overload are counted in the call's record.
  */
 export async function runFactCheck(req: FactCheckRequest): Promise<FactCheckResult> {
   const { settings, store } = req;
+  if (req.signal?.aborted) throw new AiError("aborted", "Stopped.");
   const apiKey = activeKey(settings);
   const model = activeModel(settings);
+  const retries: { kind: string; status: number | null }[] = [];
   const prompt = buildFactCheckPrompt(req.claim, req.passages);
   const providedIds = req.passages.map((p) => p.id);
   const input = {
@@ -177,19 +164,23 @@ export async function runFactCheck(req: FactCheckRequest): Promise<FactCheckResu
       signal: req.signal,
       fetchImpl: req.fetchImpl,
       sleep: req.sleep,
+      onRetry: ({ kind, status }) => retries.push({ kind, status }),
     });
     const citations = checkCitations(res.data.evidence_ids, providedIds);
     const entry = newAuditEntry(
       {
         feature: req.feature,
         provider: settings.provider,
-        model: res.model === model ? model : `${model} (served by ${res.model})`,
+        model,
+        served_model: res.model,
         input,
         output: { ...res.data, citation_check: citations },
         raw_output: null,
         error: null,
         latency_ms: res.latencyMs,
         usage: { input_tokens: res.usage.inputTokens, output_tokens: res.usage.outputTokens },
+        attempts: res.attempts,
+        retries,
       },
       apiKey,
     );
@@ -207,16 +198,17 @@ export async function runFactCheck(req: FactCheckRequest): Promise<FactCheckResu
     };
   } catch (err) {
     const e = err instanceof AiError ? err : errorFromThrown(settings.provider, err);
-    if (e.kind === "aborted") throw e;
+    const aborted = e.kind === "aborted";
     const entry: AuditEntry = newAuditEntry(
       {
         feature: req.feature,
         provider: settings.provider,
         model,
+        served_model: e.answered?.model ?? null,
         input,
         output: null,
         raw_output: e.rawText ?? null,
-        error: { kind: e.kind, message: e.message },
+        error: { kind: e.kind, message: aborted ? ABORTED_MESSAGE : e.message },
         latency_ms: e.answered?.latencyMs ?? null,
         usage: e.answered
           ? {
@@ -224,10 +216,13 @@ export async function runFactCheck(req: FactCheckRequest): Promise<FactCheckResu
               output_tokens: e.answered.usage.outputTokens,
             }
           : null,
+        attempts: e.kind === "no_key" ? null : retries.length + 1,
+        retries,
       },
       apiKey,
     );
     await store.add(entry);
+    if (aborted) throw e;
     if (e.modelFault) {
       return {
         status: "invalid_output",

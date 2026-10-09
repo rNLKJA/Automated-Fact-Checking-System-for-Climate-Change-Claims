@@ -25,8 +25,14 @@ export type AuditEntry = {
   timestamp: string;
   feature: AiFeature;
   provider: ProviderId;
-  /** model id requested (and the one the provider reported, if different) */
+  /** model id requested */
   model: string;
+  /**
+   * model id the provider reported serving, when it answered. Usually a dated
+   * snapshot of `model` (claude-haiku-4-5 -> claude-haiku-4-5-20251001); see
+   * `substitutedModel` for a real substitution.
+   */
+  served_model: string | null;
   input: { system: string; user: string; meta: Record<string, unknown> };
   /** the validated output, or null when the call failed */
   output: unknown;
@@ -35,6 +41,10 @@ export type AuditEntry = {
   error: { kind: string; message: string } | null;
   latency_ms: number | null;
   usage: { input_tokens: number | null; output_tokens: number | null } | null;
+  /** requests sent for this call: 1, plus one per retry (null when nothing was sent) */
+  attempts: number | null;
+  /** the failures that were retried (rate limit, overload, server error), in order */
+  retries: { kind: string; status: number | null }[];
   decision: HumanDecision;
   /** the human's corrected output, when the decision is "edited" */
   edited_output: unknown;
@@ -48,12 +58,15 @@ export const AUDIT_COLUMNS = [
   "feature",
   "provider",
   "model",
+  "served_model",
   "input",
   "output",
   "raw_output",
   "error",
   "latency_ms",
   "usage",
+  "attempts",
+  "retries",
   "decision",
   "edited_output",
   "decision_note",
@@ -86,8 +99,17 @@ function uuid(): string {
 
 export type NewAuditEntry = Omit<
   AuditEntry,
-  "id" | "timestamp" | "decision" | "edited_output" | "decision_note" | "decided_at"
-> & { timestamp?: string };
+  | "id"
+  | "timestamp"
+  | "served_model"
+  | "attempts"
+  | "retries"
+  | "decision"
+  | "edited_output"
+  | "decision_note"
+  | "decided_at"
+> &
+  Partial<Pick<AuditEntry, "timestamp" | "served_model" | "attempts" | "retries">>;
 
 /** Build a record, scrubbing the API key from everything in it. */
 export function newAuditEntry(fields: NewAuditEntry, apiKey: string): AuditEntry {
@@ -97,18 +119,41 @@ export function newAuditEntry(fields: NewAuditEntry, apiKey: string): AuditEntry
     feature: fields.feature,
     provider: fields.provider,
     model: fields.model,
+    served_model: fields.served_model ?? null,
     input: fields.input,
     output: fields.output,
     raw_output: fields.raw_output,
     error: fields.error,
     latency_ms: fields.latency_ms === null ? null : Math.round(fields.latency_ms),
     usage: fields.usage,
+    attempts: fields.attempts ?? null,
+    retries: fields.retries ?? [],
     decision: "pending",
     edited_output: null,
     decision_note: null,
     decided_at: null,
   };
   return redactSecrets(entry, [apiKey]);
+}
+
+/**
+ * The served model id when it is a different model from the one requested,
+ * not just a dated snapshot of it (which providers report routinely).
+ */
+export function substitutedModel(
+  requested: string,
+  served: string | null | undefined,
+): string | null {
+  if (!served || served === requested) return null;
+  const escaped = requested.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  // a dated snapshot: -20251001, -2025-08-07 or -0613
+  const snapshot = new RegExp(`^${escaped}-(\\d{8}|\\d{4}-\\d{2}-\\d{2}|\\d{4})$`);
+  return snapshot.test(served) ? null : served;
+}
+
+/** Calls the visitor can review: the model answered with a usable output. */
+export function isReviewable(entry: Pick<AuditEntry, "error">): boolean {
+  return !entry.error;
 }
 
 export type DecisionPatch = {
