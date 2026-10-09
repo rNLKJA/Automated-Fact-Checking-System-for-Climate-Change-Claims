@@ -1,0 +1,25 @@
+WEBVTT
+
+1
+00:00:00.400 --> 00:00:06.700
+Step 1 of 6. All 154 dev claims: the annotators' label, the model's verdict and the gold evidence it found
+
+2
+00:00:06.700 --> 00:00:11.900
+Step 2 of 6. Filter to the claims where the 2024 retrieval found at least one gold passage
+
+3
+00:00:11.900 --> 00:00:16.800
+Step 3 of 6. Open a claim to compare gold and retrieved evidence side by side
+
+4
+00:00:16.800 --> 00:00:23.800
+Step 4 of 6. The retrained Transformer's verdict three ways, with its class probabilities
+
+5
+00:00:23.800 --> 00:00:29.800
+Step 5 of 6. Retrieved passages (left) against the annotators' gold evidence (right); hits are marked gold
+
+6
+00:00:29.800 --> 00:00:40.320
+Step 6 of 6. Switch between the submitted 2024 retrieval and the faithful re-runs, with P, R and F per run

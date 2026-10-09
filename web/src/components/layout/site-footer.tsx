@@ -42,6 +42,11 @@ export function SiteFooter() {
               </a>
             </li>
             <li>
+              <Link className="underline-offset-4 hover:underline" href="/tour">
+                Guided tour (videos)
+              </Link>
+            </li>
+            <li>
               <Link className="underline-offset-4 hover:underline" href="/methods#data">
                 Data &amp; provenance
               </Link>

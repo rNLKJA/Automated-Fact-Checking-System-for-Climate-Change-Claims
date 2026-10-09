@@ -1,0 +1,25 @@
+WEBVTT
+
+1
+00:00:00.400 --> 00:00:05.300
+Step 1 of 6. Original model vs LLM: the same dev claims and the same evidence, scored as a paired comparison
+
+2
+00:00:05.300 --> 00:00:14.900
+Step 2 of 6. Bring your own key: AI is optional, and the key stays in this browser and goes only to the provider
+
+3
+00:00:14.900 --> 00:00:19.000
+Step 3 of 6. No key is entered in this demo. Cancel, then load a saved run file instead
+
+4
+00:00:19.000 --> 00:00:23.400
+Step 4 of 6. [Mocked AI response for illustration] A seeded mock run (no model was called) loaded through “Load a saved run”
+
+5
+00:00:23.400 --> 00:00:29.300
+Step 5 of 6. [Mocked AI response for illustration] Accuracy and macro-F1 with 95% intervals, the paired difference, McNemar's exact test
+
+6
+00:00:29.300 --> 00:00:36.120
+Step 6 of 6. [Mocked AI response for illustration] Claim by claim, each LLM verdict is labelled AI-generated beside the classifier's

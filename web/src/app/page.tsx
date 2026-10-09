@@ -1,4 +1,12 @@
-import { ArrowRight, BookOpen, Cpu, Database, FlaskConical, Search } from "lucide-react";
+import {
+  ArrowRight,
+  BookOpen,
+  CirclePlay,
+  Cpu,
+  Database,
+  FlaskConical,
+  Search,
+} from "lucide-react";
 import Link from "next/link";
 
 import { Stripes } from "@/components/common/stripes";
@@ -86,6 +94,11 @@ export default function HomePage() {
               </Button>
               <Button asChild size="lg" variant="outline" className="h-11 px-5 text-base">
                 <Link href="/explore">Explore the 154 dev claims</Link>
+              </Button>
+              <Button asChild size="lg" variant="ghost" className="h-11 px-4 text-base">
+                <Link href="/tour">
+                  <CirclePlay aria-hidden /> Watch the tour
+                </Link>
               </Button>
             </div>
           </div>
