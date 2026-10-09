@@ -56,7 +56,7 @@ function MeasureGroup({
             </div>
             <p className="font-mono text-sm tabular">
               <span className="text-base text-foreground">{r.value}</span>{" "}
-              <span className="text-muted-foreground">{r.interval}</span>
+              <span className="whitespace-nowrap text-muted-foreground">{r.interval}</span>
             </p>
             <div className="space-y-0.5">
               <IntervalBar
@@ -96,7 +96,7 @@ function Comparison({
       <div>
         <h3 className="font-serif text-xl font-medium">{title}</h3>
         <p className="mt-1 text-sm text-muted-foreground">
-          {a} vs {b}, on the same {c.n} claims.
+          {a} vs {b.toLowerCase()}, on the same {c.n} claims.
         </p>
       </div>
       <dl className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">

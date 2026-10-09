@@ -15,7 +15,11 @@ export type ModelOption = {
   note: string;
   /** USD per million tokens */
   pricing?: { input: number; output: number };
-  /** response budget for one fact-check (structured JSON, a sentence or two of rationale) */
+  /**
+   * Response ceiling for one fact-check. The answer itself is short (structured JSON and a
+   * sentence or two), but models that think before answering spend part of it on thinking,
+   * and a cut-off answer is scored as wrong. Only the tokens actually generated are billed.
+   */
   maxTokens: number;
   /** Anthropic `output_config.effort`; omitted for models that reject it (Haiku 4.5) */
   effort?: "low" | "medium" | "high";
@@ -49,7 +53,7 @@ export const ANTHROPIC_MODELS: readonly ModelOption[] = [
     label: "Claude Haiku 4.5",
     note: "Cheapest tier. The default.",
     pricing: { input: 1, output: 5 },
-    maxTokens: 1024,
+    maxTokens: 2048,
     temperature: 0,
   },
   {
@@ -57,7 +61,7 @@ export const ANTHROPIC_MODELS: readonly ModelOption[] = [
     label: "Claude Sonnet 5.5",
     note: "Stronger and about twice the price. Runs at low effort.",
     pricing: { input: 2, output: 10 },
-    maxTokens: 4096,
+    maxTokens: 16_000,
     effort: "low",
   },
 ];
@@ -67,8 +71,11 @@ export const DEFAULT_ANTHROPIC_MODEL = ANTHROPIC_MODELS[0].id;
 /** Editable in the settings dialog; any chat-completions model with JSON-schema output works. */
 export const DEFAULT_OPENAI_MODEL = "gpt-5-mini";
 
-/** OpenAI models are free text, so there is no price table for them. */
-export const OPENAI_DEFAULTS: Omit<ModelOption, "id" | "label" | "note"> = { maxTokens: 4096 };
+/**
+ * OpenAI models are free text, so there is no price table for them. The default model
+ * reasons before answering, and its reasoning tokens count towards this ceiling.
+ */
+export const OPENAI_DEFAULTS: Omit<ModelOption, "id" | "label" | "note"> = { maxTokens: 16_000 };
 
 export function anthropicModel(id: string): ModelOption | undefined {
   return ANTHROPIC_MODELS.find((m) => m.id === id);

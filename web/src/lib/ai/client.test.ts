@@ -60,7 +60,7 @@ describe("Anthropic adapter", () => {
     const body = anthropicBody({ ...req("anthropic", fetch), model: "claude-sonnet-5-5" });
     expect(body.output_config).toMatchObject({ effort: "low" });
     expect("temperature" in body).toBe(false);
-    expect(body.max_tokens).toBe(4096);
+    expect(body.max_tokens).toBe(16_000);
   });
 
   it("reports refusals and truncation as model faults", async () => {

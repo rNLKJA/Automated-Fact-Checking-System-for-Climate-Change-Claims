@@ -42,7 +42,7 @@ import {
   type HarnessRun,
   type LlmOutcome,
 } from "@/lib/evaluation/harness";
-import { claimNumber, fixed, int, pct, pp, pText, range, signed } from "@/lib/format";
+import { claimNumber, fileSafe, fixed, int, pct, pp, pText, range, signed } from "@/lib/format";
 import { describeCohensH } from "@/lib/stats";
 import { cn } from "@/lib/utils";
 import { IntervalBar, ScaleLabels } from "./interval";
@@ -60,8 +60,8 @@ const FATAL = new Set([
   "network",
 ]);
 const CONCURRENCY = 2;
-/** expected answer length (tokens) for the cost estimate */
-const OUTPUT_TOKENS: Record<string, number> = { "claude-haiku-4-5": 120, "claude-sonnet-5-5": 300 };
+/** expected output tokens per call for the cost estimate (Sonnet's include its thinking) */
+const OUTPUT_TOKENS: Record<string, number> = { "claude-haiku-4-5": 120, "claude-sonnet-5-5": 600 };
 
 function toOutcome(r: FactCheckResult): LlmOutcome {
   if (r.status === "ok") {
@@ -304,7 +304,7 @@ export function LlmHarness({ claims }: { claims: HarnessClaimSummary[] }) {
       ),
     };
     downloadText(
-      `llm-eval-${run.model}-${fileStamp()}.json`,
+      `llm-eval-${fileSafe(run.model)}-${fileStamp()}.json`,
       JSON.stringify(payload, null, 2),
       "application/json",
     );
@@ -313,7 +313,7 @@ export function LlmHarness({ claims }: { claims: HarnessClaimSummary[] }) {
   function exportCsv() {
     if (!run) return;
     downloadText(
-      `llm-eval-${run.model}-${fileStamp()}.csv`,
+      `llm-eval-${fileSafe(run.model)}-${fileStamp()}.csv`,
       toCsv(runToRows(run, byId), RUN_CSV_COLUMNS),
       "text/csv",
     );
@@ -628,10 +628,10 @@ function Pair({
       <p className="text-xs text-muted-foreground">{label}</p>
       {[["LLM", llm, "series-1"] as const, ["Classifier", clf, "series-2"] as const].map(
         ([who, v, tone]) => (
-          <div key={who} className="grid grid-cols-[5.5rem_1fr] items-center gap-3">
+          <div key={who} className="grid grid-cols-[8rem_1fr] items-center gap-3">
             <p className="text-sm">
               {who}
-              <span className="block font-mono text-xs text-muted-foreground tabular">
+              <span className="block font-mono text-xs whitespace-nowrap text-muted-foreground tabular">
                 {v.text}
               </span>
             </p>
@@ -646,7 +646,7 @@ function Pair({
           </div>
         ),
       )}
-      <div className="grid grid-cols-[5.5rem_1fr] gap-3">
+      <div className="grid grid-cols-[8rem_1fr] gap-3">
         <span />
         <ScaleLabels left={scale[2]} right={scale[3]} />
       </div>
@@ -675,9 +675,10 @@ function ConditionCard({
         <h3 className="font-serif text-xl font-medium">{CONDITIONS[s.condition].title}</h3>
         <p className="mt-1 text-sm text-muted-foreground">{CONDITIONS[s.condition].description}</p>
         <p className="mt-2 text-xs text-muted-foreground tabular">
-          {s.scored} claims scored
+          {s.scored} {s.scored === 1 ? "claim" : "claims"} scored
           {s.excluded > 0 && ` · ${s.excluded} excluded (call failed)`}
-          {s.invalidOutputs > 0 && ` · ${s.invalidOutputs} unusable answers counted as wrong`}
+          {s.invalidOutputs > 0 &&
+            ` · ${s.invalidOutputs} unusable ${s.invalidOutputs === 1 ? "answer" : "answers"} counted as wrong`}
         </p>
       </div>
 

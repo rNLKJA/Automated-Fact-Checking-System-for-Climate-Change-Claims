@@ -1,6 +1,6 @@
 /**
  * Classification metrics with scikit-learn's conventions (checked against
- * sklearn in `classification.test.ts`): per-class precision, recall and F1 with
+ * sklearn in `stats.test.ts`): per-class precision, recall and F1 with
  * `zero_division=0`, and macro-F1 averaged over the labels that appear in either
  * the gold or the predicted labels (sklearn's default label set).
  */

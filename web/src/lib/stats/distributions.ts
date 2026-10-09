@@ -4,7 +4,8 @@
  * upper incomplete gamma function (for chi-square tail probabilities), the
  * standard normal CDF and its inverse, and the binomial CDF.
  *
- * Every function is checked against scipy in `distributions.test.ts`.
+ * Every function is checked against scipy in `stats.test.ts` (reference values from
+ * `scripts/stats_reference.py`).
  */
 
 const LANCZOS_G = 7;

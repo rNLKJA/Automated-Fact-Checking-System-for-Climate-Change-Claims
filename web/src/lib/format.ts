@@ -71,3 +71,12 @@ export function pText(p: number | null | undefined): string {
   const v = pValue(p);
   return v.startsWith("<") ? `p ${v}` : `p = ${v}`;
 }
+
+/** A model id or other free text made safe for a download file name ("org/model:v1" -> "org-model-v1"). */
+export function fileSafe(s: string): string {
+  const out = s
+    .replace(/[^A-Za-z0-9._-]+/g, "-")
+    .replace(/^[-.]+|[-.]+$/g, "")
+    .slice(0, 80);
+  return out || "model";
+}

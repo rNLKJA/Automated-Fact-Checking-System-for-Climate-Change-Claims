@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { pp, pValue, range, signed } from "./format";
+import { fileSafe, pp, pValue, range, signed } from "./format";
 
 describe("number formatting for intervals and tests", () => {
   it("formats signed percentage points with a true minus sign", () => {
@@ -26,5 +26,15 @@ describe("number formatting for intervals and tests", () => {
     expect(range(0.0204, 0.0695, "fixed")).toBe("[0.020, 0.070]");
     expect(range(-0.1428, 0.026, "pp")).toBe("[−14.3 pp, +2.6 pp]");
     expect(range(0.0169, 0.105, "signed")).toBe("[+0.017, +0.105]");
+  });
+});
+
+describe("file names", () => {
+  it("makes free-text model ids safe for downloads", () => {
+    expect(fileSafe("claude-haiku-4-5")).toBe("claude-haiku-4-5");
+    expect(fileSafe("org/model:v1.2")).toBe("org-model-v1.2");
+    expect(fileSafe("../../etc")).toBe("etc");
+    expect(fileSafe("///")).toBe("model");
+    expect(fileSafe("x".repeat(200))).toHaveLength(80);
   });
 });
