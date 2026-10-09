@@ -1,0 +1,25 @@
+WEBVTT
+
+1
+00:00:00.400 --> 00:00:08.100
+Step 1 of 6. Check a claim: type any sentence about climate science
+
+2
+00:00:08.100 --> 00:00:13.700
+Step 2 of 6. Run the original 2024 pipeline: TF-IDF evidence retrieval, then the from-scratch Transformer
+
+3
+00:00:13.700 --> 00:00:21.700
+Step 3 of 6. The verdict with all four class probabilities, beside the model's dev accuracy and its 95% CI
+
+4
+00:00:21.700 --> 00:00:27.700
+Step 4 of 6. The passages it retrieved, each with its cosine similarity and tag-overlap scores
+
+5
+00:00:27.700 --> 00:00:34.400
+Step 5 of 6. Under the hood: the notebook's preprocessing, the TF-IDF tag vector and each word's exact contribution
+
+6
+00:00:34.400 --> 00:00:47.840
+Step 6 of 6. Or pick a one-click example, checked against the full 1.19M-passage search at build time

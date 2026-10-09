@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 import { ChartFrame } from "@/components/charts/chart-frame";
 import { ConfusionMatrix } from "@/components/charts/confusion-matrix";
@@ -6,8 +7,11 @@ import { LabelMix, PassageLengths } from "@/components/charts/static-charts";
 import { ThresholdSweep } from "@/components/charts/threshold-sweep";
 import { TrainingCurves } from "@/components/charts/training-curves";
 import { PageHeader, SectionHeading } from "@/components/common/section";
+import { BaselineUncertainty } from "@/components/evaluation/baseline-uncertainty";
+import { SeedSpreadCard } from "@/components/evaluation/seed-spread";
 import { int, pct } from "@/lib/format";
 import { getMeta } from "@/server/db";
+import { getBaselineReport, getSeedSpread } from "@/server/evaluation";
 import {
   confusion,
   getOverview,
@@ -20,7 +24,7 @@ import {
 export const metadata: Metadata = {
   title: "Results",
   description:
-    "Label balance, confusion matrices, retrieval threshold trade-offs, Transformer vs LSTM training curves, and every parity check against the 2024 numbers.",
+    "The 2024 system's dev-set results with 95% intervals and paired tests, error analysis by label, label balance, confusion matrices, retrieval trade-offs, training curves and every parity check.",
 };
 
 type ParityRow = {
@@ -33,6 +37,7 @@ type ParityRow = {
 
 export default function ResultsPage() {
   const o = getOverview();
+  const baseline = getBaselineReport();
   const dist = labelDistribution();
   const matrices = {
     batch: confusion("batch"),
@@ -137,6 +142,19 @@ export default function ResultsPage() {
       </PageHeader>
 
       <div className="mx-auto max-w-6xl space-y-16 px-4 py-12 sm:px-6">
+        <div className="space-y-6">
+          <BaselineUncertainty report={baseline} />
+          <SeedSpreadCard s={getSeedSpread()} majority={baseline.majority.accuracy.estimate} />
+        </div>
+
+        <p className="-mt-8 max-w-3xl text-sm text-muted-foreground">
+          How does a large language model do on the same claims and the same evidence? The{" "}
+          <Link href="/evaluation" className="text-foreground underline underline-offset-4">
+            LLM evaluation harness
+          </Link>{" "}
+          runs that comparison with your own API key, using the same statistics.
+        </p>
+
         <section className="space-y-6">
           <SectionHeading eyebrow="Data" title="An imbalanced task" />
           <div className="grid gap-6 lg:grid-cols-2">

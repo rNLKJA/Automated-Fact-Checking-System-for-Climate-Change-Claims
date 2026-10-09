@@ -18,7 +18,7 @@ function isActive(pathname: string, href: string) {
 export function MainNav({ items }: { items: readonly Item[] }) {
   const pathname = usePathname();
   return (
-    <nav aria-label="Main" className="hidden md:block">
+    <nav aria-label="Main" className="hidden lg:block">
       <ul className="flex items-center gap-1">
         {items.map((item) => {
           const active = isActive(pathname, item.href);
@@ -71,7 +71,7 @@ export function MobileNav({ items }: { items: readonly Item[] }) {
   }, [open]);
 
   return (
-    <div ref={rootRef} className="md:hidden">
+    <div ref={rootRef} className="lg:hidden">
       <Button
         ref={buttonRef}
         variant="ghost"
@@ -103,6 +103,16 @@ export function MobileNav({ items }: { items: readonly Item[] }) {
               </Link>
             </li>
           ))}
+          <li>
+            <Link
+              href="/ai-log"
+              aria-current={isActive(pathname, "/ai-log") ? "page" : undefined}
+              onClick={() => setOpen(false)}
+              className="block rounded-md px-3 py-2.5 text-base text-muted-foreground hover:bg-accent aria-[current=page]:bg-accent aria-[current=page]:font-medium aria-[current=page]:text-foreground"
+            >
+              AI audit log
+            </Link>
+          </li>
           <li>
             <a
               href={SITE.repo}

@@ -4,13 +4,14 @@ import { ArrowRight, Info, LoaderCircle, ShieldCheck, TriangleAlert } from "luci
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 
+import { SecondOpinion } from "@/components/ai/second-opinion";
 import { ProbabilityBars, VerdictBadge } from "@/components/common/verdict";
 import { EvidenceCard } from "@/components/evidence/evidence-card";
 import { TagChips } from "@/components/evidence/tag-chips";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
-import { fixed, int, pct } from "@/lib/format";
+import { fixed, int, pct, pp } from "@/lib/format";
 import { LABEL_TEXT, LABELS } from "@/lib/labels";
 import type { RuleId } from "@/lib/retrieval";
 import type { CheckResponse } from "@/lib/types";
@@ -27,6 +28,11 @@ export type SubsetAgreement = {
   byPath: Record<"filtered" | "fallback", [agree: number, total: number]>;
 };
 
+/** The one-claim-at-a-time protocol's dev accuracy (Wilson interval). */
+type DevAccuracy = { estimate: number; lower: number; upper: number; successes: number; n: number };
+/** Its paired difference from always answering "supports" (bootstrap interval). */
+type Gap = { estimate: number; lower: number; upper: number };
+
 type State =
   | { status: "idle" }
   | { status: "error"; message: string }
@@ -38,13 +44,15 @@ export function TryIt({
   agreement,
   devAccuracy,
   baseline,
+  gap,
   indexSize,
 }: {
   initialClaim?: string;
   examples: readonly Example[];
   agreement: Record<RuleId, SubsetAgreement>;
-  devAccuracy: number;
+  devAccuracy: DevAccuracy;
   baseline: number;
+  gap: Gap;
   indexSize: number;
 }) {
   const [claim, setClaim] = useState(initialClaim ?? "");
@@ -236,6 +244,7 @@ export function TryIt({
             agreement={agreement[state.result.rule]}
             devAccuracy={devAccuracy}
             baseline={baseline}
+            gap={gap}
           />
         ) : (
           <EmptyState indexSize={indexSize} />
@@ -307,11 +316,13 @@ function Result({
   agreement,
   devAccuracy,
   baseline,
+  gap,
 }: {
   r: CheckResponse;
   agreement: SubsetAgreement;
-  devAccuracy: number;
+  devAccuracy: DevAccuracy;
   baseline: number;
+  gap: Gap;
 }) {
   const c = r.classification;
   const claimTags = new Set(r.claimTags.split(" "));
@@ -333,12 +344,34 @@ function Result({
         </div>
         <ProbabilityBars probs={c.probs} highlight={c.label} className="mt-6" />
         <p className="mt-6 border-t border-border pt-4 text-xs leading-relaxed text-muted-foreground">
-          Treat this as a museum piece, not a fact-checker. On the 154 dev claims this model is
-          right {pct(devAccuracy, 0)} of the time, below the {pct(baseline, 0)} you&rsquo;d get by
-          always answering &ldquo;supports&rdquo;. It never predicts{" "}
-          {LABEL_TEXT.REFUTES.short.toLowerCase()} or {LABEL_TEXT.DISPUTED.short.toLowerCase()}.
+          Treat this as a museum piece, not a fact-checker. Run one claim at a time, as here, it is
+          right on {devAccuracy.successes} of the {devAccuracy.n} dev claims,{" "}
+          {pct(devAccuracy.estimate)}{" "}
+          <span className="whitespace-nowrap">
+            (95% CI {pct(devAccuracy.lower)} to {pct(devAccuracy.upper)})
+          </span>
+          . That is {gap.upper < 0 ? "worse than" : "no better than"} always answering
+          &ldquo;supports&rdquo; ({pct(baseline)}): the paired difference is {pp(gap.estimate)}{" "}
+          <span className="whitespace-nowrap">
+            (95% CI {pp(gap.lower)} to {pp(gap.upper)})
+          </span>
+          . It never predicts {LABEL_TEXT.REFUTES.short.toLowerCase()} or{" "}
+          {LABEL_TEXT.DISPUTED.short.toLowerCase()}.
         </p>
       </section>
+
+      <SecondOpinion
+        key={`${r.rule}:${r.claim}:${r.retrieval.passages.map((p) => p.id).join(",")}`}
+        claim={r.claim}
+        options={[
+          {
+            key: "retrieved",
+            label: "Retrieved",
+            passages: r.retrieval.passages.map((p) => ({ id: p.id, text: p.text })),
+            modelLabel: c.label,
+          },
+        ]}
+      />
 
       <section aria-labelledby="evidence-h" className="space-y-4">
         <div className="flex flex-wrap items-baseline justify-between gap-2">

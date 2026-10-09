@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { AiSettingsButton } from "@/components/ai/ai-settings-button";
 import { StripesMark } from "@/components/common/stripes";
 import { NAV, SITE } from "@/lib/site";
 import { MainNav, MobileNav } from "./main-nav";
@@ -33,6 +34,7 @@ export function SiteHeader() {
           >
             GitHub
           </a>
+          <AiSettingsButton />
           <ThemeToggle />
           <MobileNav items={NAV} />
         </div>

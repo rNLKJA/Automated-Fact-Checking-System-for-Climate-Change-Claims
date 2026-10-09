@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 
 import { PageHeader } from "@/components/common/section";
 import { TryIt } from "@/components/try/try-it";
-import { freeTextParity, getOverview, protocolAccuracies, tryExamples } from "@/server/stats";
+import { getBaselineReport, getSingleVsMajority } from "@/server/evaluation";
+import { freeTextParity, getOverview, tryExamples } from "@/server/stats";
 
 export const metadata: Metadata = {
   title: "Try a claim",
@@ -14,7 +15,8 @@ export default async function TryPage({ searchParams }: PageProps<"/try">) {
   const { claim } = await searchParams;
   const initialClaim = typeof claim === "string" ? claim.slice(0, 600) : undefined;
   const o = getOverview();
-  const acc = protocolAccuracies();
+  const b = getBaselineReport();
+  const gap = getSingleVsMajority().difference;
   const parity = freeTextParity();
   const agreement = {
     submission: {
@@ -44,8 +46,9 @@ export default async function TryPage({ searchParams }: PageProps<"/try">) {
           initialClaim={initialClaim}
           examples={tryExamples().map(({ text, note }) => ({ text, note }))}
           agreement={agreement}
-          devAccuracy={acc.single}
-          baseline={o.classifier.majority_baseline_acc}
+          devAccuracy={b.protocols.single.accuracy}
+          baseline={b.majority.accuracy.estimate}
+          gap={{ estimate: gap.estimate, lower: gap.lower, upper: gap.upper }}
           indexSize={o.index.passages}
         />
       </div>

@@ -1,14 +1,23 @@
-import { ArrowRight, BookOpen, Cpu, Database, FlaskConical, Search } from "lucide-react";
+import {
+  ArrowRight,
+  BookOpen,
+  CirclePlay,
+  Cpu,
+  Database,
+  FlaskConical,
+  Search,
+} from "lucide-react";
 import Link from "next/link";
 
 import { Stripes } from "@/components/common/stripes";
 import { Eyebrow, SectionHeading } from "@/components/common/section";
 import { VerdictBadge } from "@/components/common/verdict";
 import { Button } from "@/components/ui/button";
-import { claimNumber, fixed, int, pct } from "@/lib/format";
+import { claimNumber, fixed, int, pct, pp } from "@/lib/format";
 import { SITE, TEAM } from "@/lib/site";
 import { getClaimDetail } from "@/server/claims";
 import { getMeta } from "@/server/db";
+import { getBaselineReport } from "@/server/evaluation";
 import { getOverview, labelDistribution } from "@/server/stats";
 
 const PIPELINE = [
@@ -41,6 +50,10 @@ const PIPELINE = [
 
 export default function HomePage() {
   const o = getOverview();
+  const base = getBaselineReport();
+  const acc = base.protocols.batch.accuracy;
+  const gold = base.protocols.gold_evidence.accuracy;
+  const gap = base.classifierVsMajority.difference;
   const example = getClaimDetail("claim-752");
   const artifact = getMeta<{ term: string; passages: number; of: number }>("tag_artifact");
   const saved = example?.runs.find((r) => r.summary.run === "saved_2024");
@@ -81,6 +94,11 @@ export default function HomePage() {
               </Button>
               <Button asChild size="lg" variant="outline" className="h-11 px-5 text-base">
                 <Link href="/explore">Explore the 154 dev claims</Link>
+              </Button>
+              <Button asChild size="lg" variant="ghost" className="h-11 px-4 text-base">
+                <Link href="/tour">
+                  <CirclePlay aria-hidden /> Watch the tour
+                </Link>
               </Button>
             </div>
           </div>
@@ -261,7 +279,7 @@ export default function HomePage() {
           <ReproCard
             status="Retrained, weights were never saved"
             title={`Accuracy ${pct(o.classifier.dev_acc_retrieved_batch)} (report: ${pct(o.report.validation.accuracy)})`}
-            body={`Same code, data and hyper-parameters. The training curves track the 2024 log closely, but on retrieved evidence the model lands below the ${pct(o.classifier.majority_baseline_acc)} always-"supports" baseline. With gold evidence it reaches ${pct(o.classifier.dev_acc_gold_batch)}.`}
+            body={`Same code, data and hyper-parameters. The training curves track the 2024 log closely, but on retrieved evidence the model is right on ${acc.successes} of ${acc.n} dev claims (95% CI ${pct(acc.lower)} to ${pct(acc.upper)}), no better than always answering "supports" (${pct(base.majority.accuracy.estimate)}; paired difference ${pp(gap.estimate)}, 95% CI ${pp(gap.lower)} to ${pp(gap.upper)}). With gold evidence it reaches ${pct(gold.estimate)} (${pct(gold.lower)} to ${pct(gold.upper)}).`}
           />
           <ReproCard
             status="Matches the report"

@@ -42,3 +42,8 @@ next-env.d.ts
 
 # vitest json reports
 .vitest
+
+# playwright showcase: raw recordings and screenshots (the optimised media is committed)
+/.showcase/
+/test-results/
+/playwright-report/

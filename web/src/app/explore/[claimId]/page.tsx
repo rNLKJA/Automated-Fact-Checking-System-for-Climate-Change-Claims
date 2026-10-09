@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { SecondOpinion } from "@/components/ai/second-opinion";
 import { Eyebrow } from "@/components/common/section";
 import { ProbabilityBars, VerdictBadge } from "@/components/common/verdict";
 import { EvidenceCard } from "@/components/evidence/evidence-card";
@@ -90,6 +91,28 @@ export default async function ClaimPage({ params }: PageProps<"/explore/[claimId
       <div className="mx-auto max-w-6xl space-y-14 px-4 py-10 sm:px-6">
         <Verdicts d={d} />
         <Evidence d={d} claimTags={claimTags} />
+        <SecondOpinion
+          claim={claim.text}
+          claimId={claim.id}
+          goldLabel={claim.label}
+          options={[
+            {
+              key: "retrieved",
+              label: "Retrieved in 2024",
+              passages: (d.runs.find((r) => r.summary.run === "saved_2024")?.passages ?? []).map(
+                (p) => ({ id: p.id, text: p.text }),
+              ),
+              // the notebook protocol reads exactly this saved 2024 list
+              modelLabel: d.predictions.find((p) => p.protocol === "batch")?.label,
+            },
+            {
+              key: "gold",
+              label: "Gold",
+              passages: d.gold.map((g) => ({ id: g.id, text: g.text })),
+              modelLabel: d.predictions.find((p) => p.protocol === "gold_evidence")?.label,
+            },
+          ]}
+        />
       </div>
     </article>
   );
