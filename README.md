@@ -14,6 +14,62 @@
 
 </div>
 
+## Showcase
+
+<p align="center">
+  <a href="https://comp90042-climate-fact-check.vercel.app/tour"><img src="docs/showcase/2-check-a-claim.gif" width="960" alt="Screen recording: a claim about sea levels is typed into the Try page and checked; the 2024 model's verdict, its four class probabilities, the retrieved passages and each word's contribution appear in turn."></a>
+</p>
+
+<p align="center"><em>Check a claim: the original TF-IDF retrieval and from-scratch Transformer run on a typed sentence.<br>
+Captioned walkthroughs with step lists and transcripts are on the <a href="https://comp90042-climate-fact-check.vercel.app/tour"><strong>/tour</strong></a> page.</em></p>
+
+### Key features
+
+|                                                                                                                                                                       |                                                                                                                                                                             |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ![Landing page, light theme](docs/showcase/01-landing-light.png)<br>**Landing.** The question, the pipeline and a real dev claim with both verdicts.                  | ![Landing page, dark theme](docs/showcase/02-landing-dark.png)<br>**Dark theme.** The same page, dark.                                                                      |
+| ![Try a claim: verdict](docs/showcase/03-try-verdict.png)<br>**Check a claim.** The verdict and all four class probabilities, beside the dev-accuracy CI.             | ![Try a claim: retrieved evidence](docs/showcase/04-try-evidence.png)<br>**Retrieved evidence.** Each passage with shared tags, cosine similarity and tag overlap.          |
+| ![Explore the dev set](docs/showcase/05-explore-dev-set.png)<br>**Explore the dev set.** Headline figures with 95% CIs, filters and all 154 claims.                   | ![Gold vs retrieved evidence](docs/showcase/06-claim-evidence.png)<br>**Gold vs retrieved.** One claim's retrieved passages against the annotators' gold evidence.          |
+| ![Results with intervals](docs/showcase/07-results-uncertainty.png)<br>**Results with intervals.** Wilson CIs for accuracy, bootstrap CIs for macro-F1 and retrieval. | ![Pipeline walkthrough](docs/showcase/08-pipeline-walkthrough.png)<br>**Pipeline walkthrough.** One claim followed through every stage, with real scores.                   |
+| ![AI settings dialog](docs/showcase/09-byok-settings.png)<br>**Bring your own key.** Optional AI: your key stays in your browser, never on the server.                | ![LLM evaluation with a mocked run](docs/showcase/10-llm-eval-mocked.png)<br>**LLM evaluation (mocked run).** The paired harness, filled with a labelled mock: layout only. |
+| ![Methods and decisions](docs/showcase/11-methods.png)<br>**Methods.** Provenance, evaluation design, limitations, AI use statement, decision records.                | ![Model card](docs/showcase/12-model-card.png)<br>**Model card.** Intended use, data, evaluation with intervals, known failure modes.                                       |
+| <img src="docs/showcase/13-mobile-landing.png" width="260" alt="Phone: landing"><br>**Phone.** The landing page at 390 px.                                            | <img src="docs/showcase/14-mobile-try-verdict.png" width="260" alt="Phone: a verdict"><br>**Phone.** A verdict and its probabilities at 390 px.                             |
+
+### Workflow walkthrough
+
+Three recorded journeys, each a scripted run of the site with on-screen captions. The numbered
+steps match the captions in each recording.
+
+1. **Explore the dev set** ([GIF](docs/showcase/1-explore-dev-set.gif) · [video](https://comp90042-climate-fact-check.vercel.app/showcase/1-explore-dev-set.mp4))
+   1. Open the 154 dev claims: the annotators' label, the model's verdict and the gold evidence it found.
+   2. Filter to the 13 claims where the 2024 retrieval found at least one gold passage.
+   3. Open dev claim 752 to compare gold and retrieved evidence side by side.
+   4. Read the retrained Transformer's verdict three ways, with its class probabilities.
+   5. Compare the retrieved passages (left) with the annotators' gold evidence (right).
+   6. Switch between the submitted 2024 retrieval and the faithful re-runs, with P, R and F per run.
+2. **Check a claim** ([GIF](docs/showcase/2-check-a-claim.gif) · [video](https://comp90042-climate-fact-check.vercel.app/showcase/2-check-a-claim.mp4))
+   1. Type a claim: "Sea levels are rising faster than ever because glaciers are melting."
+   2. Run the original pipeline: TF-IDF evidence retrieval, then the from-scratch Transformer.
+   3. Read the verdict with all four class probabilities, beside the model's dev accuracy and its 95% CI.
+   4. Inspect the retrieved passages, each with its cosine similarity and tag-overlap scores.
+   5. Look under the hood: the notebook's preprocessing, the TF-IDF tag vector and each word's contribution.
+   6. Pick a one-click example that was checked against the full 1.19M-passage search.
+3. **Original model vs LLM** ([GIF](docs/showcase/3-model-vs-llm.gif) · [video](https://comp90042-climate-fact-check.vercel.app/showcase/3-model-vs-llm.mp4))
+   1. Read the protocol: the same dev claims and the same evidence, scored as a paired comparison.
+   2. Open the bring-your-own-key settings: provider, model, and where the key is kept.
+   3. Cancel without entering a key.
+   4. Load a saved run file: here a seeded **mock run, labelled "Mocked AI response for illustration"**. No model was called.
+   5. Read accuracy and macro-F1 with 95% intervals, the paired difference and McNemar's exact test.
+   6. Go claim by claim: each LLM verdict is labelled AI-generated beside the classifier's.
+
+The LLM numbers in the third recording describe the mock, not any real model. With your own key,
+[`/evaluation`](https://comp90042-climate-fact-check.vercel.app/evaluation) runs the same comparison for real.
+
+The recordings and screenshots are reproducible: `web/e2e/showcase.spec.ts` drives Google Chrome
+with Playwright through fixed inputs (one typed claim, dev claim 752, the harness's default sample
+of 20 claims with seed 42, and a mock run drawn with seed 7). See
+[Recording the showcase](#recording-the-showcase).
+
 ## Overview
 
 This repository holds a group project for **COMP90042 Natural Language Processing**
@@ -209,6 +265,7 @@ test fails if the copies drift from `docs/`.
 ├── LICENSE
 ├── .github/workflows/ci.yml     # lint, format, typecheck, test, build (web/)
 ├── docs/                        # model card, data statement, decision records (rendered at /methods)
+│   └── showcase/                # README screenshots and walkthrough GIFs (pnpm showcase)
 ├── coursework/                  # the original 2024 submission, unchanged (see its README)
 │   ├── COMP90042_Wed5PM_Group1.ipynb
 │   ├── COMP90042_Wed5PM_Group1.pdf   # the team's report
@@ -226,12 +283,14 @@ test fails if the copies drift from `docs/`.
 └── web/                         # the deployable Next.js app (Vercel root)
     ├── data/climate.db          # read-only SQLite artefact (13 MB), plus seed-spread.json
     ├── content/                 # copies of docs/ for the site (pnpm sync:docs)
+    ├── e2e/                     # Playwright tour: recorded journeys + screenshots (pnpm showcase)
+    ├── public/showcase/         # walkthrough MP4s, posters, caption tracks and screenshots for /tour
     └── src/
         ├── app/                 # /, /try, /explore, /explore/[claimId], /results, /method, /api/check,
         │                        # /evaluation, /methods (+ model card, data statement, decisions),
-        │                        # /ai-log, /api/dev-set
+        │                        # /ai-log, /api/dev-set, /tour
         ├── components/          # ui/ (shadcn), layout/, common/, evidence/, explore/, try/, charts/,
-        │                        # ai/, ai-log/, evaluation/
+        │                        # ai/, ai-log/, evaluation/, tour/
         ├── lib/                 # framework-free ports + vitest parity tests + fixtures
         │   ├── stats/           # intervals, bootstrap, McNemar, classification metrics
         │   ├── ai/              # provider adapters, settings, fact-check prompt, audit log
@@ -257,6 +316,27 @@ that a visitor pastes into their own browser; nothing on the server ever holds o
 `web/` as the Vercel root directory.
 
 After editing anything under `docs/`, run `pnpm sync:docs` in `web/` so the site's copies match.
+
+### Recording the showcase
+
+`web/e2e/showcase.spec.ts` is a Playwright script that doubles as an end-to-end test of the three
+main journeys. It uses your installed Google Chrome (`channel: "chrome"`), so no browser is
+downloaded.
+
+```bash
+cd web
+pnpm e2e                                     # the journeys as quick end-to-end tests (production)
+pnpm showcase                                # paced recordings + screenshots, then the media script
+pnpm build && BASE_URL=http://localhost:3309 pnpm showcase   # the same against a local build
+```
+
+`pnpm showcase` writes raw output to `web/.showcase/` (ignored by git), then
+`scripts/showcase-media.mjs` uses ffmpeg and cwebp to write the optimised screenshots and GIFs to
+`docs/showcase/`, and the MP4s, posters, caption tracks and WebP screenshots to
+`web/public/showcase/`. Captions, step lists and transcripts all come from `web/src/lib/tour.ts`.
+Video capture needs Playwright's ffmpeg build (`pnpm exec playwright install ffmpeg`, which is not
+a browser). No API key is used: the LLM results are a seeded mock run loaded from a file and are
+labelled as such in every caption.
 
 ## Data artefacts
 
