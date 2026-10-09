@@ -22,5 +22,16 @@ new text. Nothing under
 retrained checkpoints. Step 3 is deterministic. Re-running it on the same inputs
 produces a byte-identical `climate.db`.
 
+Two more scripts support the evaluation pages and change nothing above:
+
+| Script                              | Takes         | Output                                                                                                                                |
+| ----------------------------------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `uv run scripts/seed_spread.py`     | ~7 min a seed | `web/data/seed-spread.json`: the notebook's Transformer and LSTM retrained under seeds 42, 1, 2, 3 and 4 (needs steps 0 to 2)         |
+| `uv run scripts/stats_reference.py` | ~1 min        | `web/src/lib/__fixtures__/stats-reference.json`: scipy, statsmodels and scikit-learn reference values and the dev-set baseline report |
+
+`stats_reference.py` reads only `web/data/climate.db`. It ports the site's mulberry32 random
+number generator to Python, so the vitest suite can compare every bootstrap interval with numpy
+to twelve decimal places. Re-running it on the same database rewrites the fixture unchanged.
+
 See the root README's _Data artefacts_ section for what each output contains and how the
 results compare with the 2024 report.

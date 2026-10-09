@@ -40,6 +40,20 @@ verdicts), see the charts behind the report, and follow one claim through every 
 algorithm is a TypeScript port tested for parity against the original Python. Nothing was
 re-tuned.
 
+**What the 2026 upgrade adds:** the evaluation the project should have had in 2024, without
+changing any original result.
+
+- **Every number with its uncertainty.** Dev-set accuracy, macro-F1, retrieval precision,
+  recall and F, and the course's harmonic mean, each with a 95% interval (Wilson for
+  proportions, a percentile bootstrap over claims otherwise), paired comparisons with McNemar's
+  test and Cohen's h, an error analysis by gold label, and a five-seed retrain of both models.
+- **An LLM evaluation harness, bring your own key.** A large language model gets the same dev
+  claims and the same retrieved passages as the 2024 classifier and must return a label and the
+  ids of the passages it relied on. The page compares the two on the same claims, checks every
+  cited id, and adds a gold-evidence upper bound.
+- **Methods, model card, data statement and decision records**, rendered on the site under
+  [`/methods`](https://comp90042-climate-fact-check.vercel.app/methods).
+
 ## Results: reported vs reproduced
 
 | Metric (dev set unless noted)             |              2024 report | 2026 re-run                                                       |
@@ -63,6 +77,31 @@ kept a different one of several exactly tied passages. The exceptions are 4 list
 claim-1160, claim-1582, claim-2329) that look like top-6 fallback lists although passages pass
 the filter, which points to 2024 logic that is not in the notebook.
 
+### The same results with their uncertainty
+
+The 154 dev claims are a small sample, so every result on the site carries a 95% interval.
+Proportions use the Wilson score interval; everything else uses a percentile bootstrap that
+resamples whole claims (10,000 resamples, seed 2026). The point estimates are the original
+values. `scripts/stats_reference.py` recomputes all of them with numpy, scikit-learn and
+statsmodels, and the test suite requires the TypeScript and Python numbers to agree.
+
+| Dev set, 154 claims                                | Estimate | 95% interval      |
+| -------------------------------------------------- | -------: | ----------------- |
+| Label accuracy, retrieved evidence                 |    38.3% | 31.0% to 46.2%    |
+| Label accuracy, gold evidence                      |    57.8% | 49.9% to 65.3%    |
+| Always answering "supports"                        |    44.2% | 36.6% to 52.0%    |
+| Macro-F1, retrieved evidence                       |    0.215 | 0.172 to 0.256    |
+| Evidence F-score (course metric)                   |    0.043 | 0.020 to 0.069    |
+| Harmonic mean (course metric)                      |    0.077 | 0.039 to 0.117    |
+| Classifier minus "always supports" (paired)        |  −5.8 pp | −14.3 to +2.6 pp  |
+| Gold minus retrieved evidence, same model (paired) | +19.5 pp | +11.0 to +27.9 pp |
+
+The classifier cannot be told apart from a constant answer (McNemar exact p = 0.22), while
+better evidence would have helped it clearly (p < 0.001). Retrained under five seeds, none of
+the ten Transformer and LSTM runs beats "always supports" on retrieved evidence, and none ever
+predicts refuted or disputed. The [model card](docs/model-card.md) has the full table and the
+recall for each label.
+
 ### Four things the re-run revealed
 
 - **The Transformer never attended across words.** The encoder was built without
@@ -80,16 +119,81 @@ the filter, which points to 2024 logic that is not in the notebook.
 - **Two verdicts are never predicted.** Class imbalance (42% `SUPPORTS`, 10% `DISPUTED`) leaves
   the model answering only `SUPPORTS` or `NOT_ENOUGH_INFO`.
 
+## LLM evaluation: bring your own key
+
+The [`/evaluation`](https://comp90042-climate-fact-check.vercel.app/evaluation) page asks a
+simple question honestly: would a modern LLM do better than the 2024 classifier with the same
+evidence?
+
+- **Same inputs.** A seeded random sample of dev claims (default N = 20, seed 42). For each
+  claim the LLM receives the claim and the very passages the classifier read, each tagged with
+  its id, and must return JSON: a label, the ids of the passages it relied on and a one-line
+  rationale. The answer is validated with a schema.
+- **Two conditions.** Retrieved evidence is the like-for-like test. Gold evidence is an upper
+  bound: both systems with perfect retrieval.
+- **Paired statistics.** Accuracy and macro-F1 with intervals for both systems, the paired
+  difference with a bootstrap interval, McNemar's exact test, Cohen's h, citation validity
+  (cited ids must be among the passages shown), the course's harmonic mean, latency and tokens.
+  Calls that fail for infrastructure reasons are excluded and counted; unusable answers count as
+  wrong. Runs export as JSON or CSV and can be loaded back.
+- **Cost note.** The page estimates the cost before you run it. Twenty claims under both
+  conditions are 40 calls, a few cents with Claude Haiku 4.5. Twenty claims also give accuracy
+  intervals about 40 points wide, and the page says so next to every result.
+
+**How the key is handled.** AI is optional: every page works without it. Open _AI settings_
+(the key icon in the header), choose Anthropic (the default: `claude-haiku-4-5`, or
+`claude-sonnet-5-5`) or OpenAI (`gpt-5-mini` by default, editable), and paste your own key. It is
+kept in the tab's sessionStorage, or in localStorage only if you tick "remember on this
+device", and "forget keys" deletes it. Requests go straight from your browser to the provider
+(Anthropic with the `anthropic-dangerous-direct-browser-access` header). The key is never sent
+to this site's server, never logged, never committed and never written to the audit log. The
+site ships no LLM results, because it has no budget for model calls.
+
+**The AI audit log.** Every call, including failed ones, is recorded in your browser
+(IndexedDB) with the prompt, the output, the model, latency, the token usage the provider
+reported and your decision on the output (accepted, edited or rejected). View it at
+[`/ai-log`](https://comp90042-climate-fact-check.vercel.app/ai-log) (also linked in the
+footer and the mobile menu), export it as JSON or CSV, or clear it. Every AI output on the site
+is labelled "AI-generated". A second-opinion panel on each claim page and Try-it result uses the
+same client and the same log.
+
+The design is informed by the Australian Government's policy for the responsible use of AI in
+government, the EU AI Act's transparency principles and the NIST AI Risk Management Framework.
+It makes no claim of compliance with any of them. The AI use statement is at
+[`/methods#ai-use`](https://comp90042-climate-fact-check.vercel.app/methods#ai-use).
+
+## Methods and decision records
+
+[`/methods`](https://comp90042-climate-fact-check.vercel.app/methods) sets out data
+provenance, the method, the evaluation design, assumptions, limitations, what I'd change and
+the AI use statement. It renders these files from [`docs/`](docs/):
+
+- [`docs/model-card.md`](docs/model-card.md): intended use, training data, evaluation with
+  intervals, known failure modes and ethical considerations (`/methods/model-card`).
+- [`docs/data-statement.md`](docs/data-statement.md): course data, label imbalance, the
+  no-pretrained-weights rule, what is redistributed, and why this is not a fact-checking
+  service (`/methods/data-statement`).
+- [`docs/decisions/`](docs/decisions/): decision records, each stating the decision first, then
+  the context, options, why, what happened (weak numbers included) and what I'd change.
+  DR-001 TF-IDF retrieval over dense retrieval, DR-002 a from-scratch Transformer over an LSTM,
+  DR-003 a pruned index for serverless hosting, DR-004 bring-your-own-key LLM features. A record
+  is never edited after it is accepted; a new one supersedes it.
+
+The site deploys `web/` only, so `pnpm sync:docs` copies these files into `web/content/`, and a
+test fails if the copies drift from `docs/`.
+
 ## Tech stack
 
-| Layer   | 2024 original                                      | 2026 revival                                                                           |
-| ------- | -------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| Runtime | Python 3.10 on Google Colab                        | Next.js 16 (App Router, Server Components), React 19, TypeScript (strict)              |
-| NLP     | NLTK, contractions, scikit-learn `TfidfVectorizer` | Faithful TS ports in `web/src/lib` (Porter, Treebank tokenizer, TF-IDF, numpy argsort) |
-| Models  | PyTorch Transformer + LSTM                         | Retrained with the original code; Transformer exported as an exact token table         |
-| Data    | pandas, pickles on Google Drive                    | Read-only SQLite (`better-sqlite3`), built by reproducible `uv` scripts                |
-| UI      | –                                                  | Tailwind CSS v4, shadcn/ui, Recharts, next-themes, lucide                              |
-| Quality | –                                                  | vitest parity suite, ESLint, Prettier, GitHub Actions CI                               |
+| Layer   | 2024 original                                      | 2026 revival                                                                            |
+| ------- | -------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| Runtime | Python 3.10 on Google Colab                        | Next.js 16 (App Router, Server Components), React 19, TypeScript (strict)               |
+| NLP     | NLTK, contractions, scikit-learn `TfidfVectorizer` | Faithful TS ports in `web/src/lib` (Porter, Treebank tokenizer, TF-IDF, numpy argsort)  |
+| Models  | PyTorch Transformer + LSTM                         | Retrained with the original code; Transformer exported as an exact token table          |
+| Data    | pandas, pickles on Google Drive                    | Read-only SQLite (`better-sqlite3`), built by reproducible `uv` scripts                 |
+| UI      | –                                                  | Tailwind CSS v4, shadcn/ui, Recharts, next-themes, lucide                               |
+| Stats   | –                                                  | Wilson, bootstrap, McNemar and Cohen's h in `web/src/lib/stats`, checked against scipy  |
+| AI      | –                                                  | Optional, bring your own key: browser-direct Anthropic/OpenAI calls, zod, IndexedDB log |
+| Quality | –                                                  | vitest parity suite, ESLint, Prettier, GitHub Actions CI                                |
 
 ## Repository structure
 
@@ -98,6 +202,7 @@ the filter, which points to 2024 logic that is not in the notebook.
 ├── README.md
 ├── LICENSE
 ├── .github/workflows/ci.yml     # lint, format, typecheck, test, build (web/)
+├── docs/                        # model card, data statement, decision records (rendered at /methods)
 ├── coursework/                  # the original 2024 submission, unchanged (see its README)
 │   ├── COMP90042_Wed5PM_Group1.ipynb
 │   ├── COMP90042_Wed5PM_Group1.pdf   # the team's report
@@ -109,13 +214,22 @@ the filter, which points to 2024 logic that is not in the notebook.
 │   ├── fetch_data.py            # step 0: verify/link inputs into .cache/ (MD5-pinned)
 │   ├── build_retrieval.py       # step 1: retrieval over all 1.19M passages, parity, sweeps
 │   ├── train_classifier.py      # step 2: retrain Transformer + LSTM, export token table
-│   └── build_web_data.py        # step 3: web/data/climate.db, TS data modules, fixtures
+│   ├── build_web_data.py        # step 3: web/data/climate.db, TS data modules, fixtures
+│   ├── seed_spread.py           # optional: retrain both models under five seeds
+│   └── stats_reference.py       # reference statistics with numpy, scikit-learn, statsmodels
 └── web/                         # the deployable Next.js app (Vercel root)
-    ├── data/climate.db          # read-only SQLite artefact (13 MB)
+    ├── data/climate.db          # read-only SQLite artefact (13 MB), plus seed-spread.json
+    ├── content/                 # copies of docs/ for the site (pnpm sync:docs)
     └── src/
-        ├── app/                 # /, /try, /explore, /explore/[claimId], /results, /method, /api/check
-        ├── components/          # ui/ (shadcn), layout/, common/, evidence/, explore/, try/, charts/
+        ├── app/                 # /, /try, /explore, /explore/[claimId], /results, /method, /api/check,
+        │                        # /evaluation, /methods (+ model card, data statement, decisions),
+        │                        # /ai-log, /api/dev-set
+        ├── components/          # ui/ (shadcn), layout/, common/, evidence/, explore/, try/, charts/,
+        │                        # ai/, ai-log/, evaluation/
         ├── lib/                 # framework-free ports + vitest parity tests + fixtures
+        │   ├── stats/           # intervals, bootstrap, McNemar, classification metrics
+        │   ├── ai/              # provider adapters, settings, fact-check prompt, audit log
+        │   └── evaluation/      # baseline report, LLM harness scoring, seed spread
         ├── server/              # server-only data layer and the Try-it pipeline
         └── test/
 ```
@@ -132,8 +246,11 @@ pnpm lint && pnpm typecheck && pnpm test && pnpm build
 ```
 
 The app needs no environment variables, no database server and no API keys. Everything is
-static or read from `web/data/climate.db` on the server. Deploy with `web/` as the Vercel root
-directory.
+static or read from `web/data/climate.db` on the server. The optional AI features use a key
+that a visitor pastes into their own browser; nothing on the server ever holds one. Deploy with
+`web/` as the Vercel root directory.
+
+After editing anything under `docs/`, run `pnpm sync:docs` in `web/` so the site's copies match.
 
 ## Data artefacts
 
@@ -147,6 +264,8 @@ uv run scripts/fetch_data.py --from "/path/to/local/copy"   # or --download (202
 uv run scripts/build_retrieval.py      # ~6 min
 uv run scripts/train_classifier.py     # ~7 min on CPU
 uv run scripts/build_web_data.py       # ~1 min, deterministic (byte-identical output)
+uv run scripts/seed_spread.py          # optional, ~7 min per seed: web/data/seed-spread.json
+uv run scripts/stats_reference.py      # ~1 min: Python reference values for the stats tests
 ```
 
 The database contains:
