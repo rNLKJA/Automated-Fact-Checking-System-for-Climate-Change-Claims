@@ -477,3 +477,20 @@ export const HarnessRunSchema = z.object({
 export function parseRun(json: unknown): HarnessRun {
   return HarnessRunSchema.parse(json) as HarnessRun;
 }
+
+/**
+ * A short, readable reason why a file could not be loaded as a run: the first
+ * schema problem and where it is, rather than the validator's raw issue list.
+ */
+export function describeRunError(err: unknown): string {
+  if (err instanceof z.ZodError) {
+    const [first] = err.issues;
+    if (!first) return "it does not match the run format";
+    const where = first.path.length > 0 ? first.path.map(String).join(".") : "file";
+    const more = err.issues.length > 1 ? ` (and ${err.issues.length - 1} more)` : "";
+    return `${where}: ${first.message}${more}`;
+  }
+  if (err instanceof SyntaxError) return "it is not valid JSON";
+  if (err instanceof Error) return err.message.slice(0, 160);
+  return "unreadable";
+}

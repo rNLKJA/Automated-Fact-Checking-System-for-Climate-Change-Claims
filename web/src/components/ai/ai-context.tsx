@@ -1,6 +1,13 @@
 "use client";
 
-import { createContext, useCallback, useContext, useState, useSyncExternalStore } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import type { ReactNode } from "react";
 
 import { hasActiveKey, type AiSettings } from "@/lib/ai/settings";
@@ -19,11 +26,25 @@ const AiContext = createContext<AiContextValue>({ openSettings: () => {} });
  */
 export function AiProvider({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
-  const openSettings = useCallback(() => setOpen(true), []);
+  // The dialog is opened from several buttons rather than one Radix trigger, so
+  // remember which control opened it and give focus back there on close.
+  const opener = useRef<HTMLElement | null>(null);
+  const openSettings = useCallback(() => {
+    opener.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    setOpen(true);
+  }, []);
+  const restoreFocus = useCallback((event: Event) => {
+    const el = opener.current;
+    opener.current = null;
+    if (el?.isConnected && el !== document.body) {
+      event.preventDefault();
+      el.focus();
+    }
+  }, []);
   return (
     <AiContext.Provider value={{ openSettings }}>
       {children}
-      <AiSettingsDialog open={open} onOpenChange={setOpen} />
+      <AiSettingsDialog open={open} onOpenChange={setOpen} onCloseAutoFocus={restoreFocus} />
     </AiContext.Provider>
   );
 }

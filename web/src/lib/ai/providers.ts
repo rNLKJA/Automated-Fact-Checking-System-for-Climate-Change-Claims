@@ -35,7 +35,7 @@ export const PROVIDERS: Record<
     label: "Anthropic",
     endpoint: "https://api.anthropic.com/v1/messages",
     host: "api.anthropic.com",
-    keysUrl: "https://console.anthropic.com/settings/keys",
+    keysUrl: "https://platform.claude.com/settings/keys",
     keyHint: "sk-ant-…",
   },
   openai: {

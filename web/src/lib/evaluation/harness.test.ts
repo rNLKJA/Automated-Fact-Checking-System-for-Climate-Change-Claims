@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { harnessClaims, harnessClaimSummaries } from "@/server/evaluation";
 import type { Label } from "../labels";
 import {
+  describeRunError,
   HARNESS_DEFAULTS,
   parseRun,
   rowsFor,
@@ -233,5 +234,51 @@ describe("runs", () => {
     const o = checked.run.outcomes[sample[0].id]?.retrieved;
     expect(o?.status === "ok" && o.invalid).toEqual(["evidence-0"]);
     expect(verifyRun(run, byId)).toMatchObject({ citationsCorrected: 0, sampleMatchesSeed: true });
+  });
+});
+
+describe("describeRunError", () => {
+  function thrown(fn: () => unknown): unknown {
+    try {
+      fn();
+    } catch (err) {
+      return err;
+    }
+    throw new Error("expected a throw");
+  }
+
+  it("names the first schema problem instead of dumping the issue list", () => {
+    const msg = describeRunError(thrown(() => parseRun({ hello: "world" })));
+    expect(msg).toMatch(/^format: /);
+    expect(msg).toMatch(/\(and \d+ more\)$/);
+    expect(msg).not.toContain("[");
+    expect(msg).not.toContain('"code"');
+  });
+
+  it("gives the path into nested fields", () => {
+    const run = {
+      format: "climate-claim-checker/llm-eval",
+      version: 1,
+      startedAt: "2026-10-09T00:00:00.000Z",
+      finishedAt: null,
+      provider: "anthropic",
+      model: "claude-haiku-4-5",
+      n: 1,
+      seed: 42,
+      conditions: ["retrieved"],
+      claimIds: ["claim-752"],
+      outcomes: { "claim-752": { retrieved: { status: "ok", label: "MAYBE" } } },
+    };
+    expect(describeRunError(thrown(() => parseRun(run)))).toMatch(
+      /^outcomes\.claim-752\.retrieved\.label: /,
+    );
+  });
+
+  it("explains files that are not JSON and passes other errors through", () => {
+    expect(describeRunError(thrown(() => JSON.parse("{nope")))).toBe("it is not valid JSON");
+    expect(describeRunError(new Error("unknown claim ids: claim-1"))).toBe(
+      "unknown claim ids: claim-1",
+    );
+    expect(describeRunError("??")).toBe("unreadable");
   });
 });

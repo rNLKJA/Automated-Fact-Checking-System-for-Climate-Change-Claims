@@ -28,6 +28,7 @@ import {
   CONDITION_ORDER,
   CONDITIONS,
   HARNESS_BOOTSTRAP,
+  describeRunError,
   HARNESS_DEFAULTS,
   parseRun,
   rowsFor,
@@ -343,9 +344,7 @@ export function LlmHarness({ claims }: { claims: HarnessClaimSummary[] }) {
           : null,
       );
     } catch (err) {
-      setNotice(
-        `That file is not a run exported from this page (${err instanceof Error ? err.message.slice(0, 160) : "unreadable"}).`,
-      );
+      setNotice(`That file is not a run exported from this page (${describeRunError(err)}).`);
     }
   }
 
@@ -766,9 +765,9 @@ function ConditionCard({
         </div>
         <div>
           <dt className="text-xs text-muted-foreground">Evidence F vs gold</dt>
-          <dd className="font-mono whitespace-nowrap tabular">
-            LLM {fixed(s.evidence.llm.estimate, 2)}{" "}
-            <span className="text-muted-foreground">
+          <dd className="font-mono tabular">
+            <span className="whitespace-nowrap">LLM {fixed(s.evidence.llm.estimate, 2)}</span>{" "}
+            <span className="whitespace-nowrap text-muted-foreground">
               {range(s.evidence.llm.lower, s.evidence.llm.upper, "fixed", 2)}
             </span>
           </dd>

@@ -26,13 +26,16 @@ import { cn } from "@/lib/utils";
 export function AiSettingsDialog({
   open,
   onOpenChange,
+  onCloseAutoFocus,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  /** where focus goes when the dialog closes (it has no Radix trigger to return to) */
+  onCloseAutoFocus?: (event: Event) => void;
 }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent onCloseAutoFocus={onCloseAutoFocus}>
         <SettingsForm onDone={() => onOpenChange(false)} />
       </DialogContent>
     </Dialog>
