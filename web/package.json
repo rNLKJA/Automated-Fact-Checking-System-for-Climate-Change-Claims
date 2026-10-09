@@ -12,6 +12,9 @@
     "test:watch": "vitest",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "e2e": "playwright test",
+    "showcase": "SHOWCASE_RECORD=1 playwright test && node scripts/showcase-media.mjs",
+    "showcase:media": "node scripts/showcase-media.mjs",
     "sync:docs": "node scripts/sync-docs.mjs"
   },
   "dependencies": {
@@ -33,6 +36,7 @@
     "zod": "^4.6.5"
   },
   "devDependencies": {
+    "@playwright/test": "^1.64.0",
     "@tailwindcss/postcss": "^4",
     "@types/better-sqlite3": "^9.6.0",
     "@types/node": "^22.20.5",
